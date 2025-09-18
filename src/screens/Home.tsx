@@ -7,6 +7,7 @@ import SavingsCard from "../components/SavingsCard/SavingsCard";
 import SafeScrollView from "../components/ScrollView/SafeScrollView";
 import AddExpenseModal from "../modals/AddExpenseModal/AddExpenseModal";
 import { Screens } from "../constants/Screens";
+import { useIsScrollEnabled } from "../hooks/useAppStore";
 
 const Style_CardContainer = styled.View`
   display: flex;
@@ -16,13 +17,14 @@ const Style_CardContainer = styled.View`
 `;
 const Home = () => {
   const [ isModalVisible, setIsModalVisible ] = useState(false);
+  const isScrollEnabled = useIsScrollEnabled();
 
   const onPress = () => {
     setIsModalVisible(true);
   };
 
   return (<Layout01 title={Screens.HOME} onCTAClick={onPress}>
-    <SafeScrollView>
+    <SafeScrollView scrollEnabled={isScrollEnabled}>
       <TotalCard />
       <SavingsCard />
       <Style_CardContainer>

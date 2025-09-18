@@ -1,7 +1,7 @@
 import Layout01 from "../layouts/Layout01";
 import Label from "../components/Label/Label";
 import SafeScrollView from "../components/ScrollView/SafeScrollView";
-import { CurveType, LineChart, lineDataItem } from "react-native-gifted-charts";
+import { BarChart, CurveType, LineChart, lineDataItem, yAxisSides } from "react-native-gifted-charts";
 import styled, { css, useTheme } from "styled-components/native";
 import { useExpenseEventHandler } from "../hooks/useExpenseEventHandler";
 import { Key, useEffect, useMemo, useState } from "react";
@@ -44,12 +44,10 @@ const Analytics = () => {
     {
       label: 'Aktueller Monat',
       key: 0
-    },
-    {
+    }, {
       label: '2 Monate',
       key: 1
-    },
-    {
+    }, {
       label: '3 Monate',
       key: 2
     }
@@ -71,13 +69,16 @@ const Analytics = () => {
   const [ isParentWidth, setIsParentWidth ] = useState<boolean>(false);
 
   const linechartStyle = {
-    dataPointsColor: theme.color.primary,
-    focusedDataPointColor: theme.color.primary,
-    color: theme.color.primary,
+    dataPointsColor1: theme.color.primary,
+    color1: theme.color.primary,
     color2: theme.color.lightTransparency,
+    startOpacity2: 0,
+    strokeDashArray2: [ 6, 6 ],
+
+    dataPointsColor2: theme.color.primary,
+    focusedDataPointColor: theme.color.primary,
     startFillColor: theme.color.primary,
     endFillColor: theme.color.background,
-    startOpacity2: 0,
     endOpacity: 0,
     yAxisColor: 'transparent',
     xAxisColor: theme.color.lightTransparency,
@@ -114,27 +115,32 @@ const Analytics = () => {
     setRemainingBalanceLineData(lastEvents.map(({ remainingBalance }, i) => {
       const indexDate = new Date(startDate)
       indexDate.setDate(startDate.getDate() + i)
+      // @ts-ignore
+      const isCurrentStrip = currentPointDatas?.remainingBalanceLineData?.date === indexDate.toISOString()
+      // Show label every quarter of the selected preset range
+      const showLabel = indexDate.getDate() === 1 || indexDate.getDate() % (6 * (Number(selectedPreset) + 1)) === 0;
 
       return {
         value: remainingBalance,
-        dataPointText: numberCurrency(remainingBalance),
         date: indexDate.toISOString(),
+        verticalLineThickness: 1,
+        showVerticalLine: isCurrentStrip,
         labelTextStyle: {
           ...linechartStyle.xAxisLabelTextStyle,
-          display: !isParentWidth || indexDate.getDate() % 2 === 0 ? 'flex' : 'none',
+          display: showLabel || isCurrentStrip ? 'flex' : 'none',
 
         },
-        label: Intl.DateTimeFormat(undefined, {
+        label: showLabel || isCurrentStrip ? Intl.DateTimeFormat(undefined, {
           day: '2-digit',
           month: '2-digit'
         })
-          .format(indexDate)
+          .format(indexDate) : undefined
       }
     }))
     setBalanceLineData(lastEvents.map(({ balance }) => ({
       value: balance?.amount,
     })))
-  }, [ isParentWidth, lastEvents ]);
+  }, [ isParentWidth, lastEvents, currentPointDatas ]);
 
   useEffect(() => {
     if (isFocused) return;
@@ -191,7 +197,15 @@ const Analytics = () => {
             <Label>Datenpunkt</Label>
             <RowView justifyContent="space-between">
               <Label size="s" color="textSecondary">Datum</Label>
-              <Label size="s" weight="bold">{currentPointDatas.remainingBalanceLineData.label}</Label>
+              <Label
+                size="s"
+                weight="bold"
+              >{Intl.DateTimeFormat(undefined, {
+                day: '2-digit',
+                month: '2-digit'
+              })
+                // @ts-ignore
+                .format(new Date(currentPointDatas.remainingBalanceLineData.date))}</Label>
             </RowView>
             <RowView justifyContent="space-between">
               <Label size="s" color="textSecondary">Aktueller Saldo</Label>
@@ -207,17 +221,11 @@ const Analytics = () => {
                 weight="bold"
               >{numberCurrency(currentPointDatas?.remainingBalanceLineData?.value)}</Label>
             </RowView></View>}
-          <View onLayout={e => setParentWidth(e.nativeEvent.layout.width)}>
+          <View style={{ overflow: "hidden" }} onLayout={e => setParentWidth(e.nativeEvent.layout.width)}>
             <LineChart
               {...linechartStyle}
-              dataSet={[
-                { data: remainingBalanceLineData }, {
-                  data: balanceLineData,
-                  startOpacity: 0,
-                  color: theme.color.lightTransparency,
-                  strokeDashArray: [ 6, 6 ]
-                }
-              ]}
+              data={remainingBalanceLineData}
+              data2={balanceLineData}
               width={parentWidth - 60}
               parentWidth={parentWidth - 20}
               adjustToWidth={isParentWidth}
@@ -225,18 +233,24 @@ const Analytics = () => {
               yAxisLabelSuffix=" €"
               endSpacing={!isParentWidth ? 10 : 0}
               initialSpacing={2}
-              curveType={CurveType.QUADRATIC}
-              labelsExtraHeight={10}
-              isAnimated
-              animateOnDataChange
-              xAxisLabelsAtBottom
-              curved
-              areaChart
-              rotateLabel
-              showVerticalLines
+              yAxisSide={yAxisSides.LEFT}
+              disableScroll={isParentWidth}
               hideDataPoints
-              hideRules
               scrollToEnd
+              maxValue={Math.max(
+                ...balanceLineData.map(d => d.value || 0),
+                ...remainingBalanceLineData.map(d => d.value || 0)
+              )}
+              mostNegativeValue={Math.min(
+                ...balanceLineData.map(d => d.value || 0),
+                ...remainingBalanceLineData.map(d => d.value || 0)
+              )}
+              height={200}
+              curveType={CurveType.QUADRATIC}
+              areaChart
+              xAxisLabelsAtBottom
+              rotateLabel
+              labelsExtraHeight={25}
               getPointerProps={({ pointerIndex }: { pointerIndex: number }) => setCurrentPointDatas({
                 remainingBalanceLineData: remainingBalanceLineData[pointerIndex],
                 balanceLineData: balanceLineData[pointerIndex],
@@ -294,6 +308,48 @@ const Analytics = () => {
               </RowView>}
             </Pressable>
           </Style_PaddedView>
+        </Style_GapContainer>
+      </BaseCard>
+      <BaseCard>
+
+        <Style_GapContainer>
+        <Label weight='bold'>Restsaldo Monate</Label>
+        <BarChart
+          {...linechartStyle}
+          // visualize the remaining balance of the end of each occuring month in the data
+          width={parentWidth-40}
+          parentWidth={parentWidth-20}
+          endSpacing={0}
+          data={remainingBalanceLineData.filter((item) => {
+            const date = new Date(item.date);
+            const currentDate = new Date();
+            const nextDate = new Date(date);
+            nextDate.setDate(date.getDate() + 1);
+            return nextDate.getDate() === 1 || (date.getDate() === currentDate.getDate() && date.getMonth() === currentDate.getMonth());
+          })
+            .map((item) => ({
+              ...item,
+              label: Intl.DateTimeFormat(
+                undefined,
+                {
+                  month: '2-digit',
+                  year: '2-digit'
+                }
+              )
+                .format(new Date(item.date)),
+              labelTextStyle: linechartStyle.xAxisLabelTextStyle,
+              topLabelComponent: () => <Label size={'s'} color={'textSecondary'}>{numberCurrency(item.value)}</Label>
+
+            }))}
+          barWidth={60}
+          cappedBars
+          capColor={theme.color.primary}
+          capThickness={4}
+          showGradient
+          gradientColor={theme.color.primaryActive}
+          yAxisLabelSuffix={' €'}
+          frontColor={'transparent'}
+        />
         </Style_GapContainer>
       </BaseCard>
       <View />

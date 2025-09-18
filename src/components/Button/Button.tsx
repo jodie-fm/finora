@@ -3,6 +3,7 @@ import styled, { css, DefaultTheme } from 'styled-components/native';
 import { PressableProps } from 'react-native';
 import theme from '../../assets/style/theme';
 import Pressable from "../Pressable/Pressable";
+import * as Haptics from "expo-haptics";
 
 type ButtonProps = PressableProps & {
   children?: ReactNode;
@@ -77,10 +78,14 @@ const Button = ({
   padding = 'm',
   size = 'xl',
   isFullWidth = false,
+  onPress,
   ...rest
 }: ButtonProps) => {
   return (<Style_ButtonContainer $isFullWidth={isFullWidth}>
-    <Pressable hitSlop={0} {...rest}>
+    <Pressable hitSlop={0} onPress={async (ev) => {
+      void Haptics.selectionAsync()
+      onPress && onPress(ev);
+    }} {...rest}>
       {({ pressed }) => (<Style_Button
         $type={type}
         $padding={padding}

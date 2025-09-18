@@ -8,9 +8,11 @@ import Animated, {
 } from "react-native-reanimated";
 import Pressable from "../Pressable/Pressable";
 import Swipeable, { SwipeableMethods, SwipeableProps } from "react-native-gesture-handler/ReanimatedSwipeable";
-import { Vibration, View } from "react-native";
+import { View } from "react-native";
 import numberCurrency from "../../helpers/numberCurrency";
 import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import * as Haptics from "expo-haptics";
+import { useSetIsScrollEnabled } from "../../hooks/useAppStore";
 
 
 type ItemProps = {
@@ -42,6 +44,7 @@ const Style_DeleteAction = styled(Animated.View)`
   ${({ theme }) => css`
     background-color: ${theme.color.danger};
     padding-inline: ${theme.size.xxl.px};
+    border-radius: ${theme.size.s.value / 2 * 16}px;
   `}
 `
 
@@ -49,6 +52,7 @@ const Style_EditAction = styled(Style_DeleteAction)`
   ${({ theme }) => css`
     background-color: ${theme.color.textSecondary};
     padding-inline: ${theme.size.xxl.px};
+    border-radius: ${theme.size.s.value / 2 * 16}px;
   `}
 `
 
@@ -64,17 +68,20 @@ const Item = ({
   setEditExpenseModalVisible,
   setInfoModalVisible,
 }: ItemProps) => {
-  const vibration = 50;
   const threshold = 200;
   const ref = useRef<SwipeableMethods>(null);
   const height = useSharedValue<number | undefined>(undefined);
-  const {state, addExpenseEvent} = useExpenseEventHandler()
+  const {
+    state,
+    addExpenseEvent
+  } = useExpenseEventHandler()
+  const setIsScrollEnabled = useSetIsScrollEnabled();
 
   const renderRightActions: SwipeableProps['renderRightActions'] = (progress, translation) => {
     useAnimatedReaction(() => translation.value, (prepared, previous) => {
       if (prepared > 0) return;
       if (previous && Math.abs(previous) < threshold && Math.abs(prepared) >= threshold) {
-        runOnJS(Vibration.vibrate)(vibration)
+        runOnJS(Haptics.selectionAsync)()
       }
     }, [])
     return (<Style_DeleteAction>
@@ -86,7 +93,7 @@ const Item = ({
     useAnimatedReaction(() => translation.value, (prepared, previous) => {
       if (prepared < 0) return;
       if (previous && Math.abs(previous) < threshold && Math.abs(prepared) >= threshold) {
-        runOnJS(Vibration.vibrate)(vibration)
+        runOnJS(Haptics.selectionAsync)()
       }
     }, [])
     return (<Style_EditAction>
@@ -131,7 +138,10 @@ const Item = ({
     rightThreshold={threshold}
     leftThreshold={threshold}
     activateAfterLongPress={10000}
+    shouldCancelWhenOutside
     containerStyle={[ { overflow: "hidden" }, animatedStyle ]}
+    onSwipeableOpenStartDrag={() => setIsScrollEnabled(false)}
+    onSwipeableWillClose={() => setIsScrollEnabled(true)}
     onSwipeableWillOpen={(direction) => {
       if (direction === 'left') {
         height.value = 0;

@@ -16,6 +16,7 @@ import { useIsFocused } from "@react-navigation/native";
 import AddLoanModal from "../modals/AddLoanModal/AddLoanModal";
 import { Screens } from "../constants/Screens";
 import SafeScrollView from "../components/ScrollView/SafeScrollView";
+import { View } from "react-native";
 
 const Style_ProgressBar = styled(CircularProgressBase)
   .attrs(({ theme }) => ({
@@ -114,6 +115,10 @@ const LoanFunds = () => {
   return isFocused && (<Layout01 title={Screens.LOANFUNDS} onCTAClick={() => setIsAddModalVisible(true)}>
     <SafeScrollView>
       {loans?.map(renderItem)}
+      {!loans || loans.length === 0 && <View>
+        <Label color="textSecondary" align="center">Keine Einträge vorhanden.</Label>
+        <Label color="textSecondary" align="center">Klicken Sie auf das "+", um eins hinzuzufügen.</Label>
+      </View>}
       <EditLoanModal loanId={loanId} visible={isEditModalVisible} setVisible={setIsEditModalVisible} />
       <AddLoanModal isVisible={isAddModalVisible} setIsVisible={setIsAddModalVisible} />
     </SafeScrollView>

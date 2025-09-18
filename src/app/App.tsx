@@ -14,17 +14,16 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 import Home from '../screens/Home';
 import { createStaticNavigation } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
 import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
 import { useFonts } from '@expo-google-fonts/inter/useFonts';
-import { Appearance, Platform, useColorScheme } from 'react-native';
+import { Appearance, Platform, useColorScheme, View } from 'react-native';
 import Settings from '../screens/Settings';
 import { useMMKVString } from 'react-native-mmkv';
 import LoanFunds from '../screens/LoanFunds';
-import FontAwesomeIcon from '../components/FontAwesomeIcon/FontAwesomeIcon';
 import Analytics from "../screens/Analytics";
 import { Screens } from "../constants/Screens";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 SplashScreen.setOptions({
   duration: 1000,
@@ -35,12 +34,10 @@ SplashScreen.preventAutoHideAsync()
 
 library.add(fab, fas, far);
 
-const RootStack = createDrawerNavigator({
+const RootStack = createNativeStackNavigator({
   initialRouteName: 'Home',
   backBehavior: 'history',
   screenOptions: {
-    drawerType: 'front',
-    swipeEdgeWidth: 50,
     headerShown: false,
   },
   screens: {
@@ -48,31 +45,26 @@ const RootStack = createDrawerNavigator({
       screen: Home,
       options: {
         title: Screens.HOME,
-        drawerIcon: ({ focused }) => (<FontAwesomeIcon icon="home" color={focused ? 'primary' : 'textSecondary'} />)
       },
     },
     LoanFunds: {
       screen: LoanFunds,
       options: {
         title: Screens.LOANFUNDS,
-        drawerIcon: ({ focused }) => (
-          <FontAwesomeIcon icon="hand-holding-dollar" color={focused ? 'primary' : 'textSecondary'} />)
-      },
+
+      }
     },
     Analytics: {
       screen: Analytics,
       options: {
         title: Screens.ANALYTICS,
         lazy: false,
-        drawerIcon: ({ focused }) => (
-          <FontAwesomeIcon icon="chart-line" color={focused ? 'primary' : 'textSecondary'} />)
-      },
+      }
     },
     Settings: {
       screen: Settings,
       options: {
-        title: Screens.SETTINGS,
-        drawerIcon: ({ focused }) => (<FontAwesomeIcon icon="cog" color={focused ? 'primary' : 'textSecondary'} />)
+        title: Screens.SETTINGS
       },
     },
   },
@@ -136,7 +128,9 @@ const App = () => {
     <SafeAreaProvider>
       <ThemeProvider theme={themeObject}>
         <StatusBar style={invScheme} />
+        <View style={{backgroundColor: themeObject.color.background, flex: 1}}>
         <Navigation theme={navigatorTheme} />
+        </View>
       </ThemeProvider>
     </SafeAreaProvider>
   </React.StrictMode>);

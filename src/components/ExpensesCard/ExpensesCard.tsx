@@ -58,7 +58,10 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
     }), [ state?.expenses, theme ]);
 
   return (<BaseCard>
-    <Label color="primary" size="m" weight="bold">{type === 'fixed' ? 'Fixe Kosten' : 'Buchungen'}</Label>
+    <Label color="primary" size="m" weight="bold">
+      {type === 'fixed' ? 'Fixe Kosten' : 'Buchungen'}
+      {filteredExpenses && filteredExpenses.length > 0 ? ` (${filteredExpenses?.length})` : ''}
+    </Label>
     <GestureHandlerRootView>
       <FlatList
         data={filteredExpenses}

@@ -3,11 +3,11 @@ import styled, { css, DefaultTheme, useTheme } from 'styled-components/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ParamListBase, useNavigation } from '@react-navigation/native';
 import Button from '../components/Button/Button';
-import { DrawerNavigationProp, } from '@react-navigation/drawer';
 import FontAwesomeIcon from '../components/FontAwesomeIcon/FontAwesomeIcon'
 import Label from "../components/Label/Label";
 import { View } from "react-native";
 import { Screens } from "../constants/Screens";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type Layout01Props = {
   children?: React.ReactNode; title?: string; onCTAClick?: () => void;
@@ -77,25 +77,27 @@ const Layout01 = ({
 }: Layout01Props) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const onHomePress = () => {
-    navigation.navigate('Home');
-  }
-
-  const onAnalyticsPress = () => {
-    navigation.navigate('Analytics')
+    navigation.navigate('Home', undefined,{ pop: true});
   }
 
   const onLoanFundsPress = () => {
-    navigation.navigate('LoanFunds')
+    navigation.navigate('LoanFunds', undefined,{ pop: title !== Screens.HOME })
+  }
+
+  const onAnalyticsPress = () => {
+    navigation.navigate('Analytics', undefined,{ pop: title === Screens.SETTINGS });
   }
 
   const onSettingsPress = () => {
     navigation.navigate('Settings')
   }
 
-  const getColor = (routeName: string): keyof DefaultTheme['color']=> title === routeName ? 'primary' : 'textSecondary';
+  const getColor = (routeName: string): keyof DefaultTheme['color'] => title === routeName ?
+    'primary' :
+    'textSecondary';
 
   const Style_BottomBarLeft = <>
     <Style_BottomBarNavItem onPress={onHomePress}>
@@ -107,7 +109,7 @@ const Layout01 = ({
     <Style_BottomBarNavItem onPress={onLoanFundsPress}>
       <FontAwesomeIcon
         color={getColor(Screens.LOANFUNDS)}
-        icon="dollar-sign"
+        icon="hand-holding-dollar"
       />
     </Style_BottomBarNavItem>
   </>;
@@ -137,16 +139,8 @@ const Layout01 = ({
     <Style_Layout01>
       <Style_TopActions>
         <View>
-          {title &&
-            <Label size="l" weight="bold">{title}</Label>
-          }
+          {title && <Label size="l" weight="bold">{title}</Label>}
         </View>
-        <Button onPress={onSettingsPress}>
-          <FontAwesomeIcon
-            color="primary"
-            icon="gear"
-          />
-        </Button>
       </Style_TopActions>
       {children}
       <Style_BottomBar
@@ -158,6 +152,7 @@ const Layout01 = ({
               offsetX: 0,
               offsetY: 10,
               blurRadius: 20,
+              spreadDistance: -5,
             }
           ]
         }}
