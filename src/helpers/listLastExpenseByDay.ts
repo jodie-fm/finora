@@ -1,7 +1,6 @@
 import { ExpenseEvent } from "../types/expenses.type";
 
 const listLastExpenseByDay = (expenseEvents: ExpenseEvent[] | undefined, offsetMonths: number = 0) => {
-
   let lastEvents: ExpenseEvent[] = [];
   const today = new Date();
   const startDate = new Date(today);
