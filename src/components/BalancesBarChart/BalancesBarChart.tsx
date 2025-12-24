@@ -87,6 +87,7 @@ const BalancesBarChart = () => {
       cappedBars
       showGradient
       isAnimated
+      scrollToEnd
       noOfSections={6}
     /></View>
 
