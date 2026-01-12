@@ -13,7 +13,7 @@ export const useChartStyle = () => {
     startFillColor: theme.color.primary,
     endFillColor: theme.color.background,
     endOpacity: 0,
-    yAxisColor: 'transparent',
+    yAxisColor: theme.color.lightTransparency,
     xAxisColor: theme.color.lightTransparency,
     rulesColor: theme.color.lightTransparency,
     verticalLinesColor: theme.color.lightTransparency,
@@ -30,7 +30,7 @@ export const useChartStyle = () => {
     },
 
 
-    capColor: theme.color.primary,
+    capColor: theme.color.danger,
     //gradientColor: theme.color.primaryActive
   };
 };

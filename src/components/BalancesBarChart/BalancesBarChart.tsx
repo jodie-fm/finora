@@ -80,11 +80,8 @@ const BalancesBarChart = () => {
         >{numberCurrency(isBalance ? entry.balance?.amount : entry.remainingBalance)}</Label>
       }))}
       barWidth={70}
-      capThickness={4}
       yAxisLabelSuffix={' €'}
-      frontColor="transparent"
       pointerConfig={undefined}
-      cappedBars
       showGradient
       isAnimated
       scrollToEnd
@@ -97,6 +94,7 @@ const BalancesBarChart = () => {
     </RowView>
     <Checkbox isActive={isBalance} setIsActive={setIsBalance}>
       <Label size="s">Saldo darstellen</Label>
-    </Checkbox></Style_GapContainer>;
+    </Checkbox>
+  </Style_GapContainer>;
 };
 export default BalancesBarChart;

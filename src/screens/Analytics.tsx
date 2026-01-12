@@ -94,11 +94,17 @@ const Analytics = () => {
   return isFocused && <Layout01 title={Screens.ANALYTICS}>
     <SafeScrollView>
       <BaseCard>
+        <Style_GapContainer>
+          <Label weight="bold">Restsaldo Monate</Label>
+          <BalancesBarChart />
+        </Style_GapContainer>
+      </BaseCard>
+      <BaseCard>
         <BalancesLineChart />
       </BaseCard>
       <BaseCard>
         <Style_GapContainer>
-          <Label>Aktueller Stand</Label>
+          <Label weight="bold">Aktueller Stand</Label>
           <RowView justifyContent="space-between">
             <Label size="s" color="textSecondary">Aktueller Saldo</Label>
             <Label size="s" weight="bold">{numberCurrency(state?.currentBalance?.amount)}</Label>
@@ -112,7 +118,7 @@ const Analytics = () => {
             >{numberCurrency(state?.remainingBalance)}</Label>
           </RowView>
           <Separator space="none" />
-          <Label>Empfehlungen / Maßnahmen</Label>
+          <Label weight="bold">Empfehlungen / Maßnahmen</Label>
           {state?.remainingBalance && state?.remainingBalance < 0 ? remainingBalanceNegative : daysUntilNegative && daysUntilNegative < remainingDays && warningRemainingBalance}
           <Label size="s" color="primary">Um im positiven Ergebnis zu bleiben, können Sie folgendes
             berücksichtigen:</Label>
@@ -128,12 +134,6 @@ const Analytics = () => {
               </RowView>}
             </Pressable>
           </Style_PaddedView>
-        </Style_GapContainer>
-      </BaseCard>
-      <BaseCard>
-        <Style_GapContainer>
-          <Label weight="bold">Restsaldo Monate</Label>
-          <BalancesBarChart />
         </Style_GapContainer>
       </BaseCard>
       <View />

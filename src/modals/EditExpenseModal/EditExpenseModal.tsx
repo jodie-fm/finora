@@ -151,7 +151,7 @@ const EditExpenseModal = ({
     </View>
     {editExpense?.type === 'fixed' && (<>
       <Separator space="none" />
-      <Label size="s" color="textSecondary">Bezahlt</Label>
+      <Label size="s" color="textSecondary">Bezahlt {editExpense.paid && editExpense.paid.length > 0 ? `(${editExpense.paid.length})` : ''}</Label>
       <Style_FlatList
         data={editExpense.paid}
         keyExtractor={(item) => (item as BaseExpense).id}

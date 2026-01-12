@@ -66,7 +66,7 @@ const BalancesLineChart = () => {
         showVerticalLine: isCurrentStrip,
         labelTextStyle: {
           ...linechartStyle.xAxisLabelTextStyle, display: showLabel || isCurrentStrip ? 'flex' : 'none',
-
+          transform: [{translateY: isCurrentStrip ? '100%' : 0}],
         },
         label: showLabel || isCurrentStrip ? Intl.DateTimeFormat(undefined, {
           day: '2-digit', month: '2-digit'
@@ -135,8 +135,6 @@ const BalancesLineChart = () => {
         height={200}
         curveType={CurveType.QUADRATIC}
         areaChart
-        xAxisLabelsAtBottom
-        rotateLabel
         hideDataPoints
         scrollToEnd
         labelsExtraHeight={25}
