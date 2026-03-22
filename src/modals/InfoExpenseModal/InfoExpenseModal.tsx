@@ -6,10 +6,13 @@ import Pressable from "../../components/Pressable/Pressable";
 import RowView from "../../components/RowView/RowView";
 import styled, { css } from "styled-components/native";
 import React from "react";
-import { Expense } from "../../types/expenses.type";
+import { BaseExpense, Expense } from "../../types/expenses.type";
 import currency from "../../helpers/numberCurrency";
 import Separator from "../../components/Separator/Separator";
 import { View } from "react-native";
+import Checkbox from "../../components/Checkbox/Checkbox";
+import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import uuid from "react-native-uuid";
 
 type InfoExpenseModalProps = {
   expense: Expense;
@@ -34,6 +37,7 @@ const InfoExpenseModal = ({
   setIsVisible,
   setIsEditModalVisible,
 }: InfoExpenseModalProps) => {
+  const { state, addExpenseEvent } = useExpenseEventHandler();
   const paid =
     expense?.paid &&
     Math.min(
@@ -56,6 +60,23 @@ const InfoExpenseModal = ({
 
   const onFinishPress = () => {
     onRequestClose();
+  };
+
+  const onIsPaidPress = () => {
+    if (!expense || expense.type !== "fixed") return;
+    const restPaid: BaseExpense = {
+      id: uuid.v4(),
+      amount: rest,
+      date: new Date().toISOString(),
+    };
+    addExpenseEvent({
+      action: "updated",
+      expense: {
+        ...expense,
+        paid: rest === 0 ? [] : [...(expense.paid || []), restPaid],
+      },
+      previousExpense: expense,
+    });
   };
 
   return (
@@ -109,6 +130,14 @@ const InfoExpenseModal = ({
           </>
         )}
       </Style_AmountView>
+      {expense.type === "fixed" && (
+        <RowView justifyContent="flex-end" gap="xs">
+          <Label color="textSecondary" size="s">
+            Bezahlt
+          </Label>
+          <Checkbox isActive={rest === 0} setIsActive={onIsPaidPress} />
+        </RowView>
+      )}
       <Button onPress={onFinishPress}>
         <Label>OK</Label>
       </Button>
