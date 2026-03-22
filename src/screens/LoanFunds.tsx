@@ -24,7 +24,7 @@ const Style_ProgressBar = styled(CircularProgressBase)
     inActiveStrokeColor: theme.color.background,
     activeStrokeColor: theme.color.primary,
     inActiveStrokeWidth: 24,
-    radius: 75,
+    radius: 60,
     duration: 1000,
   }))``;
 
@@ -51,10 +51,10 @@ const Style_Check = styled.View`
 
 const LoanFunds = () => {
   const isFocused = useIsFocused();
-  const [ loans ] = useMMKVObject<Loan[]>('loans');
-  const [ loanId, setLoanId ] = useState<Loan['id']>();
-  const [ isEditModalVisible, setIsEditModalVisible ] = useState(false);
-  const [ isAddModalVisible, setIsAddModalVisible ] = useState(false);
+  const [loans] = useMMKVObject<Loan[]>('loans');
+  const [loanId, setLoanId] = useState<Loan['id']>();
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const onItemPress = (id: string) => {
     setLoanId(id);
@@ -66,7 +66,7 @@ const LoanFunds = () => {
     description,
     lend,
     returned
-  }: NonNullable<typeof loans>[number]) => {
+  }: Loan) => {
     const totalLend = lend?.reduce((acc, amount) => (acc + amount), 0) || 0;
     const totalReturned = Math.min(returned?.reduce((acc, amount) => (acc + amount), 0) || 0, totalLend);
     const rest = totalLend - totalReturned;
@@ -86,27 +86,43 @@ const LoanFunds = () => {
             }}
           />
         </RowView>
-        <Style_ProgressBarContainer>
-          <Style_ProgressBar
-            value={totalReturned}
-            maxValue={totalLend}
-          >
-            <Label align="center" weight="bold">{numberCurrency(totalReturned)}</Label>
-            <Label align="center" color="textSecondary" size="s">/{numberCurrency(totalLend)}</Label>
-          </Style_ProgressBar>
-        </Style_ProgressBarContainer>
-        <Separator space="none" />
-        <RowView
-          style={{
-            justifyContent: 'space-between',
-          }}
-        >
-          <Label color="textSecondary" size="s">
-            Restbetrag
-          </Label>
-          <Label color="textSecondary" size="s" weight="bold">
-            {numberCurrency(rest)}
-          </Label>
+        <RowView flexWrap='nowrap'>
+          <Style_ProgressBarContainer>
+            <Style_ProgressBar
+              value={totalReturned}
+              maxValue={totalLend}
+            >
+              <Label align="center" weight="bold">{numberCurrency(totalReturned)}</Label>
+              <Label align="center" color="textSecondary" size="s">/{numberCurrency(totalLend)}</Label>
+            </Style_ProgressBar>
+          </Style_ProgressBarContainer>
+          <View style={{flex: 1}}>
+            <RowView justifyContent='space-between'>
+              <Label color="textSecondary" size="s">
+                Betrag
+              </Label>
+              <Label color="danger" size="s" weight="bold">
+                {numberCurrency(totalLend)}
+              </Label>
+            </RowView>
+            <RowView justifyContent='space-between'>
+              <Label color="textSecondary" size="s">
+                Bezahlt
+              </Label>
+              <Label color="primary" size="s" weight="bold">
+                {numberCurrency(totalReturned)}
+              </Label>
+            </RowView>
+            <Separator space='none' />
+            <RowView justifyContent='space-between'>
+              <Label color="textSecondary" size="s">
+                Differenz
+              </Label>
+              <Label weight="bold">
+                {numberCurrency(rest)}
+              </Label>
+            </RowView>
+          </View>
         </RowView>
       </Style_Item>
     </BaseCard>);
