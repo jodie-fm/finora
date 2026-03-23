@@ -31,10 +31,6 @@ const BalancesBarChart = () => {
     [expenseEvents],
   );
 
-  useEffect(() => {
-    console.log("rendered balances end of month");
-  }, [balancesEndOfMonth]);
-
   return (
     <Style_GapContainer>
       <View onLayout={(e) => setParentWidth(e.nativeEvent.layout.width)}>

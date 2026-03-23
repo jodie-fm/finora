@@ -1,17 +1,23 @@
-import React from 'react';
-import styled, { css, DefaultTheme, useTheme } from 'styled-components/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ParamListBase, useNavigation } from '@react-navigation/native';
-import Button from '../components/Button/Button';
-import FontAwesomeIcon from '../components/FontAwesomeIcon/FontAwesomeIcon'
+import React from "react";
+import styled, { css, DefaultTheme, useTheme } from "styled-components/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ParamListBase, useNavigation } from "@react-navigation/native";
+import Button from "../components/Button/Button";
+import FontAwesomeIcon from "../components/FontAwesomeIcon/FontAwesomeIcon";
 import Label from "../components/Label/Label";
-import { View } from "react-native";
 import { Screens } from "../constants/Screens";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type Layout01Props = {
-  children?: React.ReactNode; title?: string; onCTAClick?: () => void;
-}
+  /** The content to be displayed within the layout */
+  children?: React.ReactNode;
+  /** The title of the current screen */
+  title?: string;
+  /** An optional button to be displayed in the top right corner of the layout */
+  topAction?: React.ReactNode;
+  /** An optional callback function to be executed when the CTA button is clicked */
+  onCTAClick?: () => void;
+};
 
 const Style_SafeView = styled.View`
   display: flex;
@@ -64,113 +70,118 @@ const Style_BottomBarNavItem = styled.Pressable`
     padding-block: ${theme.size.l.px};
     gap: ${theme.size.s.px};
   `}
-`
+`;
 const Style_CTAButton = styled.View`
   bottom: 75%;
   height: 1px;
-`
+`;
 
 const Layout01 = ({
   children,
   title,
-  onCTAClick
+  topAction,
+  onCTAClick,
 }: Layout01Props) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const onHomePress = () => {
-    navigation.navigate('Home', undefined,{ pop: true});
-  }
+    navigation.navigate("Home", undefined, { pop: true });
+  };
 
   const onLoanFundsPress = () => {
-    navigation.navigate('LoanFunds', undefined,{ pop: title !== Screens.HOME })
-  }
+    navigation.navigate("LoanFunds", undefined, {
+      pop: title !== Screens.HOME,
+    });
+  };
 
   const onAnalyticsPress = () => {
-    navigation.navigate('Analytics', undefined,{ pop: title === Screens.SETTINGS });
-  }
+    navigation.navigate("Analytics", undefined, {
+      pop: title === Screens.SETTINGS,
+    });
+  };
 
   const onSettingsPress = () => {
-    navigation.navigate('Settings')
-  }
+    navigation.navigate("Settings");
+  };
 
-  const getColor = (routeName: string): keyof DefaultTheme['color'] => title === routeName ?
-    'primary' :
-    'textSecondary';
+  const getColor = (routeName: string): keyof DefaultTheme["color"] =>
+    title === routeName ? "primary" : "textSecondary";
 
-  const Style_BottomBarLeft = <>
-    <Style_BottomBarNavItem onPress={onHomePress}>
-      <FontAwesomeIcon
-        color={getColor(Screens.HOME)}
-        icon="home"
-      />
-    </Style_BottomBarNavItem>
-    <Style_BottomBarNavItem onPress={onLoanFundsPress}>
-      <FontAwesomeIcon
-        color={getColor(Screens.LOANFUNDS)}
-        icon="hand-holding-dollar"
-      />
-    </Style_BottomBarNavItem>
-  </>;
+  const Style_BottomBarLeft = (
+    <>
+      <Style_BottomBarNavItem onPress={onHomePress}>
+        <FontAwesomeIcon color={getColor(Screens.HOME)} icon="home" />
+      </Style_BottomBarNavItem>
+      <Style_BottomBarNavItem onPress={onLoanFundsPress}>
+        <FontAwesomeIcon
+          color={getColor(Screens.LOANFUNDS)}
+          icon="hand-holding-dollar"
+        />
+      </Style_BottomBarNavItem>
+    </>
+  );
 
-  const Style_BottomBarRight = <>
-    <Style_BottomBarNavItem onPress={onAnalyticsPress}>
-      <FontAwesomeIcon
-        color={getColor(Screens.ANALYTICS)}
-        icon="chart-line"
-      />
-    </Style_BottomBarNavItem>
-    <Style_BottomBarNavItem onPress={onSettingsPress}>
-      <FontAwesomeIcon
-        color={getColor(Screens.SETTINGS)}
-        icon="cog"
-      />
-    </Style_BottomBarNavItem>
-  </>;
+  const Style_BottomBarRight = (
+    <>
+      <Style_BottomBarNavItem onPress={onAnalyticsPress}>
+        <FontAwesomeIcon
+          color={getColor(Screens.ANALYTICS)}
+          icon="chart-line"
+        />
+      </Style_BottomBarNavItem>
+      <Style_BottomBarNavItem onPress={onSettingsPress}>
+        <FontAwesomeIcon color={getColor(Screens.SETTINGS)} icon="cog" />
+      </Style_BottomBarNavItem>
+    </>
+  );
 
-  return (<Style_SafeView
-    style={{
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-    }}
-  >
-    <Style_Layout01>
-      <Style_TopActions>
-        <View>
-          {title && <Label size="l" weight="bold">{title}</Label>}
-        </View>
-      </Style_TopActions>
-      {children}
-      <Style_BottomBar
-        style={{
-          paddingBottom: insets.bottom,
-          boxShadow: [
-            {
-              color: theme.color.textSecondary,
-              offsetX: 0,
-              offsetY: 10,
-              blurRadius: 20,
-              spreadDistance: -5,
-            }
-          ]
-        }}
-      >
-        {Style_BottomBarLeft}
-        {onCTAClick && <Style_CTAButton>
-          <Button type="primary" padding="l" onPress={onCTAClick}>
-            <FontAwesomeIcon
-              color="surface"
-              size="l"
-              icon="plus"
-            />
-          </Button>
-        </Style_CTAButton>}
-        {Style_BottomBarRight}
-      </Style_BottomBar>
-    </Style_Layout01>
-  </Style_SafeView>);
+  return (
+    <Style_SafeView
+      style={{
+        paddingTop: insets.top,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
+    >
+      <Style_Layout01>
+        <Style_TopActions>
+          {title && (
+            <Label size="l" weight="bold">
+              {title}
+            </Label>
+          )}
+          {topAction}
+        </Style_TopActions>
+        {children}
+        <Style_BottomBar
+          style={{
+            paddingBottom: insets.bottom,
+            boxShadow: [
+              {
+                color: theme.color.textSecondary,
+                offsetX: 0,
+                offsetY: 10,
+                blurRadius: 20,
+                spreadDistance: -5,
+              },
+            ],
+          }}
+        >
+          {Style_BottomBarLeft}
+          {onCTAClick && (
+            <Style_CTAButton>
+              <Button type="primary" padding="l" onPress={onCTAClick}>
+                <FontAwesomeIcon color="surface" size="l" icon="plus" />
+              </Button>
+            </Style_CTAButton>
+          )}
+          {Style_BottomBarRight}
+        </Style_BottomBar>
+      </Style_Layout01>
+    </Style_SafeView>
+  );
 };
 
 export default Layout01;

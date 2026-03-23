@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components/native";
 import { Expense } from "../../types/expenses.type";
-import React, { useRef } from "react";
+import React, { memo, useRef } from "react";
 import Label from "../Label/Label";
 import FontAwesomeIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import Animated, {
@@ -203,4 +203,4 @@ const Item = ({
   );
 };
 
-export default Item;
+export default memo(Item);

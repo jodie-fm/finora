@@ -27,12 +27,14 @@ type EditExpenseProps = Omit<Expense, "amount"> & {
   amount: string;
 };
 
-const Style_FlatList = styled.FlatList.attrs(({ theme }) => ({
-  contentContainerStyle: {
-    gap: theme.size.s.value * 16,
-    padding: theme.size.s.value * 16,
-  },
-}))`
+const Style_FlatList = styled.FlatList.attrs(({ theme }) => {
+  return {
+    contentContainerStyle: {
+      gap: theme.size.s.value * 16,
+      padding: theme.size.s.value * 16,
+    },
+  };
+})`
   max-height: 100px;
   ${({ theme }) => css`
     border-radius: ${theme.size.s.px};
@@ -162,6 +164,11 @@ const EditExpenseModal = ({
           <Style_FlatList
             data={editExpense.paid}
             keyExtractor={(item) => (item as BaseExpense).id}
+            getItemLayout={(_, index) => ({
+              length: 27,
+              offset: 27 * index,
+              index,
+            })}
             renderItem={({ item }) => {
               const paid = item as BaseExpense;
               return (

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Label from "../Label/Label";
 import BaseCard from "../BaseCard/BaseCard";
 import { Expense } from "../../types/expenses.type";
@@ -27,8 +27,9 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
   const [expenseId, setExpenseId] = useState<Expense["id"]>();
   const expense = useMemo(
     () => state?.expenses?.find((expense) => expense.id === expenseId),
-    [expenseId, state?.expenses],
+    [expenseId, state],
   );
+
   const [isEditExpenseModalVisible, setEditExpenseModalVisible] =
     useState(false);
   const [isInfoModalVisible, setInfoModalVisible] = useState(false);
@@ -37,12 +38,12 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
     () =>
       state?.expenses
         ?.filter((expense) => expense.type === type)
-        ?.map(({ id, description, amount, paid }) => {
+        ?.map(({ description, amount, paid, ...expense }) => {
           const reducedPaid =
             (paid && paid.reduce((acc, x) => acc + x.amount, 0)) || 0;
           const color = theme.color.background;
           return {
-            id,
+            ...expense,
             amount,
             description: description && (
               <Label color="textSecondary" size="s">
@@ -80,14 +81,73 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
     </Label>
   );
 
+  const renderItem = useCallback(
+    ({ item }: { item: NonNullable<typeof filteredExpenses>[number] }) => (
+      <ListItem
+        item={item}
+        type={type}
+        setExpenseId={setExpenseId}
+        setEditExpenseModalVisible={setEditExpenseModalVisible}
+        setInfoModalVisible={setInfoModalVisible}
+      />
+    ),
+    [type],
+  );
+
+  const itemSeparator = useCallback(() => <Separator space="none" />, []);
+
+  const getItemLayout = useCallback(
+    (_: unknown, index: number) => ({
+      length: 81,
+      offset: 81 * index,
+      index,
+    }),
+    [],
+  );
+
   return (
     <BaseCard>
-      <RowView justifyContent="space-between">
-        <Title />
-        <Pressable onPress={() => setSummaryModalVisible(true)}>
-          <FontAwesomeIcon icon="info-circle" color="textSecondary" size="s" />
-        </Pressable>
-      </RowView>
+      <GestureHandlerRootView>
+        <FlatList
+          data={filteredExpenses}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+          ItemSeparatorComponent={itemSeparator}
+          getItemLayout={getItemLayout}
+          ListHeaderComponent={() => (
+            <RowView justifyContent="space-between">
+              <Title />
+              <Pressable onPress={() => setSummaryModalVisible(true)}>
+                <FontAwesomeIcon
+                  icon="info-circle"
+                  color="textSecondary"
+                  size="s"
+                />
+              </Pressable>
+            </RowView>
+          )}
+          renderItem={renderItem}
+          initialNumToRender={4}
+          maxToRenderPerBatch={4}
+          windowSize={1}
+        />
+      </GestureHandlerRootView>
+      {expense && (
+        <>
+          <EditExpenseModal
+            expense={expense}
+            visible={isEditExpenseModalVisible}
+            setVisible={setEditExpenseModalVisible}
+          />
+          <InfoExpenseModal
+            expense={expense}
+            isVisible={isInfoModalVisible}
+            setIsEditModalVisible={setEditExpenseModalVisible}
+            setIsVisible={setInfoModalVisible}
+          />
+        </>
+      )}
+
       <Modal
         visible={isSummaryModalVisible}
         onRequestClose={() => setSummaryModalVisible(false)}
@@ -139,38 +199,6 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
           )}
         </View>
       </Modal>
-      <GestureHandlerRootView>
-        <FlatList
-          data={filteredExpenses}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          ItemSeparatorComponent={() => <Separator space="none" />}
-          renderItem={({ item }) => (
-            <ListItem
-              item={item}
-              type={type}
-              setExpenseId={setExpenseId}
-              setEditExpenseModalVisible={setEditExpenseModalVisible}
-              setInfoModalVisible={setInfoModalVisible}
-            />
-          )}
-        />
-      </GestureHandlerRootView>
-      {expense && (
-        <>
-          <EditExpenseModal
-            expense={expense}
-            visible={isEditExpenseModalVisible}
-            setVisible={setEditExpenseModalVisible}
-          />
-          <InfoExpenseModal
-            expense={expense}
-            isVisible={isInfoModalVisible}
-            setIsEditModalVisible={setEditExpenseModalVisible}
-            setIsVisible={setInfoModalVisible}
-          />
-        </>
-      )}
     </BaseCard>
   );
 };

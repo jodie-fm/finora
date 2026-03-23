@@ -2591,6 +2591,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-transform-remove-console@npm:6.9.4":
+  version: 6.9.4
+  resolution: "babel-plugin-transform-remove-console@npm:6.9.4"
+  checksum: 10c0/8bb152eed6685b92c371d72be3d9107d879f64b507f3e255edd6a1fb4806e9bcf39011d6f32ce1d8d745fb3533d1da4d5c706eefa633fae25151866c986f2e24
+  languageName: node
+  linkType: hard
+
 "babel-preset-current-node-syntax@npm:^1.0.0":
   version: 1.1.0
   resolution: "babel-preset-current-node-syntax@npm:1.1.0"
@@ -3957,6 +3964,7 @@ __metadata:
     "@react-navigation/native-stack": "npm:7.3.10"
     "@react-navigation/stack": "npm:7.4.8"
     "@types/react": "npm:~19.0.10"
+    babel-plugin-transform-remove-console: "npm:6.9.4"
     expo: "npm:53.0.20"
     expo-blur: "npm:~14.1.5"
     expo-constants: "npm:~17.1.7"
@@ -3978,8 +3986,9 @@ __metadata:
     react-native-drawer-layout: "npm:4.1.6"
     react-native-gesture-handler: "npm:~2.24.0"
     react-native-gifted-charts: "npm:1.4.70"
-    react-native-mmkv: "npm:3.2.0"
+    react-native-mmkv: "npm:4.3.0"
     react-native-modal: "npm:13.0.1"
+    react-native-nitro-modules: "npm:0.35.2"
     react-native-reanimated: "npm:3.17.5"
     react-native-safe-area-context: "npm:^5.4.0"
     react-native-screens: "npm:4.11.1"
@@ -6200,13 +6209,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-mmkv@npm:3.2.0":
-  version: 3.2.0
-  resolution: "react-native-mmkv@npm:3.2.0"
+"react-native-mmkv@npm:4.3.0":
+  version: 4.3.0
+  resolution: "react-native-mmkv@npm:4.3.0"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 10c0/41abc5b46d61de7bf0f6af0ed66fab19a391d3fdc30b011cc49ba4dce65ab7c7b1c53eda768bc71f718543e89c7d46848dab2cd537b2af39afd624a8b4f0fec4
+    react-native-nitro-modules: "*"
+  checksum: 10c0/ef4c89224c4452ae9b5b903fe9c24a17cf8f03eab77fa68f101a485a508e68af0aad0659a01c0c2cc6b71a5bd0ad5e403a3994e499c0db8a471d413f18d5deb8
   languageName: node
   linkType: hard
 
@@ -6220,6 +6230,16 @@ __metadata:
     react: "*"
     react-native: ">=0.65.0"
   checksum: 10c0/8ec5728c2a27eb31c97451968b4ecefdf005afda51fab2fc864fc442122573c70f7bf3fa0c6e3bd1d6aab3565c684104d1d30df916c3f9a6c7c3223e4d3b9249
+  languageName: node
+  linkType: hard
+
+"react-native-nitro-modules@npm:0.35.2":
+  version: 0.35.2
+  resolution: "react-native-nitro-modules@npm:0.35.2"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/6136f36ac1dc01dface7a4765b3258c8c8c766bc77c53765dfa6a29ff9f2091b13ce3e2a8a651e515cda045d125fc6fdd4f450cb4aabb0ab94c3d6b4b7b55b77
   languageName: node
   linkType: hard
 

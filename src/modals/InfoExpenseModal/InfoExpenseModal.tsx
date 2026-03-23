@@ -37,7 +37,7 @@ const InfoExpenseModal = ({
   setIsVisible,
   setIsEditModalVisible,
 }: InfoExpenseModalProps) => {
-  const { state, addExpenseEvent } = useExpenseEventHandler();
+  const { addExpenseEvent } = useExpenseEventHandler();
   const paid =
     expense?.paid &&
     Math.min(

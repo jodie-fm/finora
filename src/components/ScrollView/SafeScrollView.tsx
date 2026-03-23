@@ -4,7 +4,7 @@ const SafeScrollView = styled.ScrollView.attrs(({ theme }) => {
   return {
     contentContainerStyle: {
       gap: theme.size.l.value * 16,
-    }
+    },
   };
 })`
   display: flex;
