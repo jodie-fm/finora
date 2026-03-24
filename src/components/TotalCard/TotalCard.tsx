@@ -20,16 +20,11 @@ const Style_Item = styled(Pressable)`
 `;
 
 const TotalCard = () => {
-  const { state, expenseEvents, addExpenseEvent } = useExpenseEventHandler();
+  const { state, expenseEvents, addExpenseEvent, calculateRemainingBalance } =
+    useExpenseEventHandler();
+  const { remainingBalance, fixedValue, variableValue } =
+    calculateRemainingBalance();
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const remainingBalance = state?.remainingBalance;
-  const fixedValue = state?.expenses
-    ?.filter((expense) => expense.type === "fixed")
-    .reduce((acc, expense) => acc + expense.amount, 0);
-  const variableValue = state?.expenses
-    ?.filter((expense) => expense.type === "variable")
-    .reduce((acc, expense) => acc + expense.amount, 0);
 
   const previousMonthBalance = useMemo(
     () => getBalancesEndOfMonth(expenseEvents).at(-2)?.remainingBalance,
