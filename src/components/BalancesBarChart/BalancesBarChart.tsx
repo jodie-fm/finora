@@ -21,7 +21,6 @@ const Style_GapContainer = styled.View`
 const BalancesBarChart = () => {
   const theme = useTheme();
   const [parentWidth, setParentWidth] = useState<number>(0);
-  const [isBalance, setIsBalance] = useState<boolean>(false);
   const chartStyle = useChartStyle();
 
   const { expenseEvents } = useExpenseEventHandler();
@@ -47,17 +46,6 @@ const BalancesBarChart = () => {
                 value: entry.remainingBalance || 0,
                 gradientColor: theme.color.primary,
               },
-              ...(isBalance
-                ? [
-                    {
-                      value:
-                        (entry.balance?.amount || 0) -
-                        (entry.remainingBalance || 0),
-                      gradientColor: theme.color.lightTransparency,
-                      marginBottom: 2,
-                    },
-                  ]
-                : []),
             ],
             label: Intl.DateTimeFormat(undefined, {
               month: "2-digit",
@@ -67,9 +55,7 @@ const BalancesBarChart = () => {
             labelTextStyle: chartStyle.xAxisLabelTextStyle,
             topLabelComponent: () => (
               <Label size="s" color="textSecondary">
-                {currency(
-                  isBalance ? entry.balance?.amount : entry.remainingBalance,
-                )}
+                {currency(entry.remainingBalance)}
               </Label>
             ),
           }))}
@@ -84,22 +70,11 @@ const BalancesBarChart = () => {
       </View>
 
       <RowView gap="s" justifyContent="center">
-        {isBalance && (
-          <>
-            <DotLight color="lightTransparency" />
-            <Label size="s" color="textSecondary">
-              Saldo
-            </Label>
-          </>
-        )}
         <DotLight color="primary" />
         <Label size="s" color="textSecondary">
           Restsaldo
         </Label>
       </RowView>
-      <Checkbox isActive={isBalance} setIsActive={setIsBalance}>
-        <Label size="s">Saldo darstellen</Label>
-      </Checkbox>
     </Style_GapContainer>
   );
 };

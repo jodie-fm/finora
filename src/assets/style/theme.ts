@@ -63,8 +63,8 @@ const lightColors = {
 };
 const darkColors: typeof lightColors = {
   color: {
-    background: "#0f1614",
-    surface: "#1c1f1d",
+    background: "#000000",
+    surface: "#0e1314",
     surfaceActive: "#161817",
     primary: "#10B981",
     primaryActive: "#059669",

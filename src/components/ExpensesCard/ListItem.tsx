@@ -15,7 +15,7 @@ import Swipeable, {
   SwipeableMethods,
   SwipeableProps,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import currency from "../../helpers/numberCurrency";
 import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
 import * as Haptics from "expo-haptics";
@@ -93,7 +93,11 @@ const Item = ({
           Math.abs(previous) < threshold &&
           Math.abs(prepared) >= threshold
         ) {
-          runOnJS(Haptics.selectionAsync)();
+          Platform.OS === "android"
+            ? runOnJS(Haptics.performAndroidHapticsAsync)(
+                Haptics.AndroidHaptics.Confirm,
+              )
+            : runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
       },
       [],
@@ -118,7 +122,11 @@ const Item = ({
           Math.abs(previous) < threshold &&
           Math.abs(prepared) >= threshold
         ) {
-          runOnJS(Haptics.selectionAsync)();
+          Platform.OS === "android"
+            ? runOnJS(Haptics.performAndroidHapticsAsync)(
+                Haptics.AndroidHaptics.Confirm,
+              )
+            : runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
         }
       },
       [],
@@ -139,6 +147,7 @@ const Item = ({
       expense: previousExpense,
     });
     setEditExpenseModalVisible(false);
+    setIsScrollEnabled(true);
   };
 
   const onPressItem = (id: string) => {

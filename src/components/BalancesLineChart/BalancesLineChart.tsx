@@ -26,18 +26,28 @@ const Style_GapContainer = styled.View`
 
 const BalancesLineChart = () => {
   const isFocused = useIsFocused();
+  const { state, expenseEvents } = useExpenseEventHandler();
   const presetItems = [
     {
-      label: "Aktueller Monat",
+      label: "Derzeit",
       key: 0,
     },
     {
-      label: "2 Monate",
-      key: 1,
+      label: "3M",
+      key: 3,
     },
     {
-      label: "3 Monate",
-      key: 2,
+      label: "6M",
+      key: 6,
+    },
+    {
+      label: "Zu Beginn",
+      key: expenseEvents
+        ? Math.ceil(
+            (new Date().getTime() - new Date(expenseEvents[0].date).getTime()) /
+              (1000 * 60 * 60 * 24 * 30),
+          )
+        : 0,
     },
   ];
   const [selectedPreset, setSelectedPreset] = useState<Key>(presetItems[0].key);
@@ -56,7 +66,6 @@ const BalancesLineChart = () => {
   const [isParentWidth, setIsParentWidth] = useState<boolean>(false);
 
   const linechartStyle = useChartStyle();
-  const { state, expenseEvents } = useExpenseEventHandler();
   const { lastEvents, startDate, today } = useMemo(
     () => listLastExpenseByDay(expenseEvents, Number(selectedPreset)),
     [expenseEvents, selectedPreset],

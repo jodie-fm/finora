@@ -48,20 +48,30 @@ const Analytics = () => {
     () =>
       state?.remainingBalance &&
       Math.max(state?.remainingBalance / remainingDays, 0),
-    [state?.remainingBalance],
+    [state?.remainingBalance, remainingDays],
   );
-
-  const averageDailyVariableExpense = useMemo(
+  const variableExpenses = useMemo(
     () =>
       expenseEvents &&
       expenseEvents
-        ?.filter(
+        .filter(
           (event) =>
             event.expense?.type === "variable" && event.action === "added",
         )
-        ?.reduce((acc, event) => acc + event.expense!.amount, 0) /
-        today.getDate(),
+        .filter((event) => {
+          const eventDate = new Date(event.date);
+          const sevenDaysAgo = new Date(today);
+          sevenDaysAgo.setDate(today.getDate() - 7);
+          return eventDate >= sevenDaysAgo && eventDate <= today;
+        }),
     [expenseEvents, today],
+  );
+  const averageDailyVariableExpense = useMemo(
+    () =>
+      variableExpenses &&
+      variableExpenses.reduce((acc, event) => acc + event.expense!.amount, 0) /
+        today.getDate(),
+    [variableExpenses, today],
   );
   const daysUntilNegative = useMemo(
     () =>
@@ -74,61 +84,107 @@ const Analytics = () => {
   daysUntilNegative &&
     dateUntilNegative.setDate(today.getDate() + daysUntilNegative);
 
-  const warningRemainingBalance = (
-    <Pressable>
-      <Label size="s" color="warning">
-        Anhand Ihrer variablen Ausgaben könnte Ihr Restsaldo im Minus fallen!
-      </Label>
-      <Style_PaddedView>
-        <RowView justifyContent="space-between">
-          <Label size="s" color="textSecondary">
-            Bisherige durchschn. Tagesausgabe:
+  const remainingBalanceMap = useMemo(
+    () => ({
+      default: <></>,
+      warning: (
+        <Pressable>
+          <Label size="s" color="warning">
+            Anhand Ihrer variablen Ausgaben könnte Ihr Restsaldo im Minus
+            fallen!
           </Label>
-          <Label size="s" weight="bold">
-            {currency(averageDailyVariableExpense)}
+          <Style_PaddedView>
+            <RowView
+              justifyContent="space-between"
+              alignItems="flex-end"
+              flexWrap="nowrap"
+            >
+              <Label size="s" color="textSecondary">
+                Ø Tagesausgabe der letzten 7 Tage:
+              </Label>
+              <Label size="s" weight="bold" shrink={false}>
+                {currency(averageDailyVariableExpense)}
+              </Label>
+            </RowView>
+            <RowView
+              justifyContent="space-between"
+              alignItems="flex-end"
+              flexWrap="nowrap"
+            >
+              <Label size="s" color="textSecondary">
+                Heutiges Datum:
+              </Label>
+              <Label size="s" weight="bold" shrink={false}>
+                {Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(
+                  today,
+                )}
+              </Label>
+            </RowView>
+          </Style_PaddedView>
+          <Style_PaddedView>
+            <RowView
+              justifyContent="space-between"
+              flexWrap="nowrap"
+              alignItems="flex-end"
+            >
+              <Label size="s" color="textSecondary">
+                Mögliches Datum für{" "}
+                <FontAwesomeIcon
+                  icon="less-than-equal"
+                  size="xs"
+                  color="textSecondary"
+                />{" "}
+                {currency(0, 0)}:
+              </Label>
+              <Label size="s" weight="bold" shrink={false}>
+                {Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(
+                  dateUntilNegative,
+                )}
+              </Label>
+            </RowView>
+            <RowView gap="s" flexWrap="nowrap">
+              <FontAwesomeIcon
+                icon="arrow-right"
+                size="s"
+                color="textSecondary"
+              />
+              <Label size="s" color="textSecondary">
+                Beachten Sie die max. durchschnittliche Tagesausgabe, um am Ende
+                des Monats positiv zu bleiben.
+              </Label>
+            </RowView>
+          </Style_PaddedView>
+        </Pressable>
+      ),
+      error: (
+        <Pressable>
+          <Label size="s" color="danger">
+            Ihr Restsaldo liegt im Minus!
           </Label>
-        </RowView>
-      </Style_PaddedView>
-      <Style_PaddedView>
-        <RowView justifyContent="space-between">
-          <Label size="s" color="textSecondary">
-            Wann es im Minus sein könnte:
-          </Label>
-          <Label size="s" weight="bold">
-            {Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-              dateUntilNegative,
-            )}
-          </Label>
-        </RowView>
-        <RowView gap="s" flexWrap="nowrap">
-          <FontAwesomeIcon icon="arrow-right" size="s" color="textSecondary" />
-          <Label size="s" color="textSecondary">
-            Beachten Sie die max. durchschnittliche Tagesausgabe, um am Ende des
-            Monats positiv zu bleiben.
-          </Label>
-        </RowView>
-      </Style_PaddedView>
-    </Pressable>
-  );
-
-  const remainingBalanceNegative = (
-    <Pressable>
-      <Label size="s" color="danger">
-        Ihr Restsaldo liegt im Minus!
-      </Label>
-      <RowView flexWrap="nowrap">
-        <FontAwesomeIcon icon="arrow-right" size="s" color="textSecondary" />
-        <Label size="s" color="textSecondary">
-          Können fixe Kosten verringert werden?
-        </Label>
-      </RowView>
-      <RowView flexWrap="nowrap">
-        <FontAwesomeIcon icon="arrow-right" size="s" color="textSecondary" />
-        <Label size="s" color="textSecondary">
-          Benötigen/Nutzen Sie wirklich alle Abonnements zurzeit?
-        </Label>
-      </RowView>
-    </Pressable>
+          <RowView flexWrap="nowrap">
+            <FontAwesomeIcon
+              icon="arrow-right"
+              size="s"
+              color="textSecondary"
+            />
+            <Label size="s" color="textSecondary">
+              Können fixe Kosten verringert werden?
+            </Label>
+          </RowView>
+          <RowView flexWrap="nowrap">
+            <FontAwesomeIcon
+              icon="arrow-right"
+              size="s"
+              color="textSecondary"
+            />
+            <Label size="s" color="textSecondary">
+              Benötigen/Nutzen Sie wirklich alle Abonnements zurzeit?
+            </Label>
+          </RowView>
+        </Pressable>
+      ),
+    }),
+    [],
   );
 
   return (
@@ -175,11 +231,20 @@ const Analytics = () => {
               </RowView>
               <Separator space="none" />
               <Label weight="bold">Empfehlungen / Maßnahmen</Label>
-              {state?.remainingBalance && state?.remainingBalance < 0
-                ? remainingBalanceNegative
-                : daysUntilNegative &&
-                  daysUntilNegative < remainingDays &&
-                  warningRemainingBalance}
+              {
+                remainingBalanceMap[
+                  Boolean(
+                    state?.remainingBalance && state?.remainingBalance < 0,
+                  )
+                    ? "error"
+                    : Boolean(
+                          daysUntilNegative &&
+                          daysUntilNegative < remainingDays,
+                        )
+                      ? "warning"
+                      : "default"
+                ]
+              }
               <Label size="s" color="primary">
                 Um im positiven Ergebnis zu bleiben, können Sie folgendes
                 berücksichtigen:
@@ -187,7 +252,7 @@ const Analytics = () => {
               <Style_PaddedView>
                 <Pressable>
                   <RowView justifyContent="space-between">
-                    <Label size="s">Durschn. Tagesausgabe:</Label>
+                    <Label size="s">Ø Tagesausgabe:</Label>
                     <Label size="s" weight="bold">
                       {currency(averageRemainingExpense)}
                     </Label>
