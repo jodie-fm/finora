@@ -22,10 +22,39 @@ const BalancesBarChart = () => {
   const chartStyle = useChartStyle();
 
   const expenseEvents = useExpenseEvents();
+  const monthFormatter = useMemo(
+    () =>
+      Intl.DateTimeFormat(undefined, {
+        month: "2-digit",
+        year: "2-digit",
+      }),
+    [],
+  );
 
   const balancesEndOfMonth = useMemo(
     () => getBalancesEndOfMonth(expenseEvents),
     [expenseEvents],
+  );
+
+  const stackData = useMemo(
+    () =>
+      balancesEndOfMonth.map((entry) => ({
+        stacks: [
+          {
+            value: entry.remainingBalance || 0,
+            gradientColor: theme.color.primary,
+          },
+        ],
+        label: monthFormatter.format(entry.date),
+        color: "transparent",
+        labelTextStyle: chartStyle.xAxisLabelTextStyle,
+        topLabelComponent: () => (
+          <Label size="s" color="textSecondary">
+            {currency(entry.remainingBalance)}
+          </Label>
+        ),
+      })),
+    [balancesEndOfMonth, chartStyle.xAxisLabelTextStyle, monthFormatter, theme.color.primary],
   );
 
   return (
@@ -38,25 +67,7 @@ const BalancesBarChart = () => {
           height={200}
           parentWidth={parentWidth - 20}
           yAxisExtraHeight={40}
-          stackData={balancesEndOfMonth.map((entry) => ({
-            stacks: [
-              {
-                value: entry.remainingBalance || 0,
-                gradientColor: theme.color.primary,
-              },
-            ],
-            label: Intl.DateTimeFormat(undefined, {
-              month: "2-digit",
-              year: "2-digit",
-            }).format(entry.date),
-            color: "transparent",
-            labelTextStyle: chartStyle.xAxisLabelTextStyle,
-            topLabelComponent: () => (
-              <Label size="s" color="textSecondary">
-                {currency(entry.remainingBalance)}
-              </Label>
-            ),
-          }))}
+          stackData={stackData}
           barWidth={70}
           yAxisLabelSuffix={" €"}
           pointerConfig={undefined}

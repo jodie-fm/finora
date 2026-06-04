@@ -27,6 +27,15 @@ const Style_GapContainer = styled.View`
   `}
 `;
 
+type ChartLineDataItem = lineDataItem & {
+  pointDate: string;
+};
+
+type ChartPointData = {
+  remainingBalanceLineData: ChartLineDataItem;
+  balanceLineData: lineDataItem;
+};
+
 const BalancesLineChart = () => {
   const isFocused = useIsFocused();
   const state = useExpenseState();
@@ -55,17 +64,7 @@ const BalancesLineChart = () => {
     },
   ];
   const [selectedPreset, setSelectedPreset] = useState<Key>(presetItems[0].key);
-  const [currentPointDatas, setCurrentPointDatas] = useState<
-    | {
-        remainingBalanceLineData: lineDataItem;
-        balanceLineData: lineDataItem;
-      }
-    | undefined
-  >();
-  const [remainingBalanceLineData, setRemainingBalanceLineData] = useState<
-    lineDataItem[]
-  >([]);
-  const [balanceLineData, setBalanceLineData] = useState<lineDataItem[]>([]);
+  const [currentPointDatas, setCurrentPointDatas] = useState<ChartPointData>();
   const [parentWidth, setParentWidth] = useState<number>(0);
   const [isParentWidth, setIsParentWidth] = useState<boolean>(false);
 
@@ -98,23 +97,35 @@ const BalancesLineChart = () => {
   daysUntilNegative &&
     dateUntilNegative.setDate(today.getDate() + daysUntilNegative);
 
-  // Set visual line data (remainingbalance data vs. currentbalance data)
-  useEffect(() => {
-    setRemainingBalanceLineData(
-      lastEvents.map(({ remainingBalance }, i) => {
+  const axisDateFormatter = useMemo(
+    () =>
+      Intl.DateTimeFormat(undefined, {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+    [],
+  );
+  const mediumDateFormatter = useMemo(
+    () => Intl.DateTimeFormat(undefined, { dateStyle: "medium" }),
+    [],
+  );
+
+  const currentPointDate = currentPointDatas?.remainingBalanceLineData.pointDate;
+
+  const remainingBalanceLineData = useMemo<ChartLineDataItem[]>(
+    () =>
+      lastEvents.map(({ remainingBalance }, index) => {
         const indexDate = new Date(startDate);
-        indexDate.setDate(startDate.getDate() + i);
-        // @ts-ignore
-        const isCurrentStrip =
-          currentPointDatas?.remainingBalanceLineData?.date ===
-          indexDate.toISOString();
+        indexDate.setDate(startDate.getDate() + index);
+        const pointDate = indexDate.toISOString();
+        const isCurrentStrip = currentPointDate === pointDate;
         const showLabel =
           indexDate.getDate() === 1 ||
           indexDate.getDate() % (6 * (Number(selectedPreset) + 1)) === 0;
 
         return {
           value: remainingBalance,
-          date: indexDate.toISOString(),
+          pointDate,
           verticalLineThickness: 1,
           showVerticalLine: isCurrentStrip,
           labelTextStyle: {
@@ -124,20 +135,39 @@ const BalancesLineChart = () => {
           },
           label:
             showLabel || isCurrentStrip
-              ? Intl.DateTimeFormat(undefined, {
-                  day: "2-digit",
-                  month: "2-digit",
-                }).format(indexDate)
+              ? axisDateFormatter.format(indexDate)
               : undefined,
         };
       }),
-    );
-    setBalanceLineData(
+    [
+      axisDateFormatter,
+      currentPointDate,
+      lastEvents,
+      linechartStyle.xAxisLabelTextStyle,
+      selectedPreset,
+      startDate,
+    ],
+  );
+
+  const balanceLineData = useMemo<lineDataItem[]>(
+    () =>
       lastEvents.map(({ balance }) => ({
         value: balance?.amount,
       })),
-    );
-  }, [isParentWidth, lastEvents, currentPointDatas]);
+    [lastEvents],
+  );
+
+  const chartBounds = useMemo(() => {
+    const values = [
+      ...balanceLineData.map((data) => data.value || 0),
+      ...remainingBalanceLineData.map((data) => data.value || 0),
+    ];
+
+    return {
+      maxValue: Math.max(...values, 0),
+      mostNegativeValue: Math.min(...values, 0),
+    };
+  }, [balanceLineData, remainingBalanceLineData]);
 
   useEffect(() => {
     if (isFocused) return;
@@ -147,12 +177,9 @@ const BalancesLineChart = () => {
   return (
     <Style_GapContainer>
       <Label size="s" color="textSecondary" align="center">
-        {Intl.DateTimeFormat(undefined, {
-          day: "2-digit",
-          month: "2-digit",
-        }).format(startDate)}{" "}
+        {axisDateFormatter.format(startDate)}{" "}
         -{" "}
-        {Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(today)}
+        {mediumDateFormatter.format(today)}
       </Label>
       <Presets
         items={presetItems}
@@ -168,14 +195,9 @@ const BalancesLineChart = () => {
                 Datum
               </Label>
               <Label size="s" weight="bold">
-                {Intl.DateTimeFormat(undefined, {
-                  day: "2-digit",
-                  month: "2-digit",
-                })
-                  // @ts-ignore
-                  .format(
-                    new Date(currentPointDatas.remainingBalanceLineData.date),
-                  )}
+                {axisDateFormatter.format(
+                  new Date(currentPointDatas.remainingBalanceLineData.pointDate),
+                )}
               </Label>
             </RowView>
             <RowView justifyContent="space-between">
@@ -213,26 +235,25 @@ const BalancesLineChart = () => {
           initialSpacing={2}
           yAxisSide={yAxisSides.LEFT}
           disableScroll={isParentWidth}
-          maxValue={Math.max(
-            ...balanceLineData.map((d) => d.value || 0),
-            ...remainingBalanceLineData.map((d) => d.value || 0),
-          )}
-          mostNegativeValue={Math.min(
-            ...balanceLineData.map((d) => d.value || 0),
-            ...remainingBalanceLineData.map((d) => d.value || 0),
-          )}
+          maxValue={chartBounds.maxValue}
+          mostNegativeValue={chartBounds.mostNegativeValue}
           height={200}
           curveType={CurveType.QUADRATIC}
           areaChart
           hideDataPoints
           scrollToEnd
           labelsExtraHeight={25}
-          getPointerProps={({ pointerIndex }: { pointerIndex: number }) =>
+          getPointerProps={({ pointerIndex }: { pointerIndex: number }) => {
+            const remainingBalancePoint = remainingBalanceLineData[pointerIndex];
+            const balancePoint = balanceLineData[pointerIndex];
+
+            if (!remainingBalancePoint || !balancePoint) return;
+
             setCurrentPointDatas({
-              remainingBalanceLineData: remainingBalanceLineData[pointerIndex],
-              balanceLineData: balanceLineData[pointerIndex],
-            })
-          }
+              remainingBalanceLineData: remainingBalancePoint,
+              balanceLineData: balancePoint,
+            });
+          }}
           pointerConfig={{
             ...linechartStyle.pointerConfig,
             activatePointersOnLongPress: true,
