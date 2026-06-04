@@ -171,7 +171,7 @@ const Layout01 = ({
             marginBottom: insets.bottom,
             boxShadow: [
               {
-                color: theme.color.textSecondary,
+                color: theme.color.shadow,
                 offsetX: 0,
                 offsetY: 10,
                 blurRadius: 20,

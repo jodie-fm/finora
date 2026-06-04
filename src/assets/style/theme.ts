@@ -59,13 +59,14 @@ const lightColors = {
     danger: "#EF4444",
     info: "#3B82F6",
     lightTransparency: "#00000019",
+    shadow: "#6B7280",
   },
 };
 const darkColors: typeof lightColors = {
   color: {
     background: "#000000",
-    surface: "#0e1314",
-    surfaceActive: "#161817",
+    surface: "#141c1d",
+    surfaceActive: "#1c2626",
     primary: "#10B981",
     primaryActive: "#059669",
     textPrimary: "#F9FAFB",
@@ -75,6 +76,7 @@ const darkColors: typeof lightColors = {
     danger: "#EF4444",
     info: "#3B82F6",
     lightTransparency: "#FFFFFF19",
+    shadow: "#000000",
   },
 };
 
