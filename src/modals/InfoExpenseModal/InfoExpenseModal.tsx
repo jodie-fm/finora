@@ -56,6 +56,7 @@ const InfoExpenseModal = ({
   };
 
   const onEditPress = () => {
+    setIsVisible(false);
     setIsEditModalVisible(true);
   };
 
