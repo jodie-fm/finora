@@ -16,20 +16,55 @@ type AddExpenseEventProps = {
   previousExpense?: BaseExpense | Expense;
 };
 
-export const useExpenseEventHandler = () => {
+const useExpenseStateStorage = () => {
   const MMKVCurrent = useMMKV({ id: "currentMMKV", compareBeforeSet: true });
+  const [state, setState] = useMMKVObject<CurrentExpenses>(
+    "state",
+    MMKVCurrent,
+  );
+
+  return {
+    MMKVCurrent,
+    state,
+    setState,
+  };
+};
+
+const useExpenseEventsStorage = () => {
   const MMKVEvents = useMMKV({ id: "eventsMMKV", compareBeforeSet: true });
   const [expenseEvents, setExpenseEvents] = useMMKVObject<ExpenseEvent[]>(
     "expenseEvents",
     MMKVEvents,
   );
-  const [state, setState] = useMMKVObject<CurrentExpenses>(
-    "state",
-    MMKVCurrent,
-  );
-  const [, startTransition] = useTransition();
 
-  const calculateRemainingBalance = useCallback(
+  return {
+    MMKVEvents,
+    expenseEvents,
+    setExpenseEvents,
+  };
+};
+
+export const useExpenseState = () => useExpenseStateStorage().state;
+
+export const useExpenseEvents = () => useExpenseEventsStorage().expenseEvents;
+
+export const useExpenseStorage = () => {
+  const { MMKVCurrent } = useExpenseStateStorage();
+  const { MMKVEvents } = useExpenseEventsStorage();
+
+  return useMemo(
+    () => ({
+      MMKVCurrent,
+      MMKVEvents,
+    }),
+    [MMKVCurrent, MMKVEvents],
+  );
+};
+
+export const useCalculateRemainingBalance = () => {
+  const state = useExpenseState();
+
+  return useCallback(
     (
       { expenses, currentBalance, savings }: CurrentExpenses = {
         expenses: state?.expenses,
@@ -72,8 +107,15 @@ export const useExpenseEventHandler = () => {
     },
     [state],
   );
+};
 
-  const addExpenseEvent = useCallback(
+export const useAddExpenseEvent = () => {
+  const { state, setState } = useExpenseStateStorage();
+  const { setExpenseEvents } = useExpenseEventsStorage();
+  const calculateRemainingBalance = useCalculateRemainingBalance();
+  const [, startTransition] = useTransition();
+
+  return useCallback(
     ({ action, expense, previousExpense, ...props }: AddExpenseEventProps) => {
       const savings =
         props.savings === null
@@ -135,8 +177,22 @@ export const useExpenseEventHandler = () => {
         setExpenseEvents((prevEvents) => [...(prevEvents || []), newEvent]);
       });
     },
-    [state, calculateRemainingBalance],
+    [
+      calculateRemainingBalance,
+      setExpenseEvents,
+      setState,
+      startTransition,
+      state,
+    ],
   );
+};
+
+export const useExpenseEventHandler = () => {
+  const { MMKVCurrent } = useExpenseStateStorage();
+  const { MMKVEvents, expenseEvents } = useExpenseEventsStorage();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
+  const calculateRemainingBalance = useCalculateRemainingBalance();
 
   return useMemo(
     () => ({

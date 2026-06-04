@@ -10,7 +10,10 @@ import { useIsScrollEnabled } from "../hooks/useAppStore";
 import Button from "../components/Button/Button";
 import FontAwesomeIcon from "../components/FontAwesomeIcon/FontAwesomeIcon";
 import InputValueModal from "../modals/InputValueModal/InputValueModal";
-import { useExpenseEventHandler } from "../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useExpenseState,
+} from "../hooks/useExpenseEventHandler";
 import uuid from "react-native-uuid";
 import currency from "../helpers/numberCurrency";
 import Label from "../components/Label/Label";
@@ -22,7 +25,8 @@ const Style_CardContainer = styled.View`
   `}
 `;
 const Home = () => {
-  const { state, addExpenseEvent } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSavingsModalVisible, setIsSavingsModalVisible] = useState(false);
   const isScrollEnabled = useIsScrollEnabled();

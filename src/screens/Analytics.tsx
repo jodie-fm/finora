@@ -2,7 +2,10 @@ import Layout01 from "../layouts/Layout01";
 import Label from "../components/Label/Label";
 import SafeScrollView from "../components/ScrollView/SafeScrollView";
 import styled, { css } from "styled-components/native";
-import { useExpenseEventHandler } from "../hooks/useExpenseEventHandler";
+import {
+  useExpenseEvents,
+  useExpenseState,
+} from "../hooks/useExpenseEventHandler";
 import { useMemo } from "react";
 import { View } from "react-native";
 import currency from "../helpers/numberCurrency";
@@ -32,7 +35,8 @@ const Style_PaddedView = styled.View`
 
 const Analytics = () => {
   const isFocused = useIsFocused();
-  const { state, expenseEvents } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const expenseEvents = useExpenseEvents();
 
   const { today } = useMemo(
     () => listLastExpenseByDay(expenseEvents),

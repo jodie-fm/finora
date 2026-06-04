@@ -10,7 +10,12 @@ import FontAwesomeIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import Pressable from "../Pressable/Pressable";
 import InputValueModal from "../../modals/InputValueModal/InputValueModal";
 import uuid from "react-native-uuid";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useCalculateRemainingBalance,
+  useExpenseEvents,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 import getBalancesEndOfMonth from "../../helpers/getBalancesEndOfMonth";
 
 const Style_Item = styled(Pressable)`
@@ -20,8 +25,10 @@ const Style_Item = styled(Pressable)`
 `;
 
 const TotalCard = () => {
-  const { state, expenseEvents, addExpenseEvent, calculateRemainingBalance } =
-    useExpenseEventHandler();
+  const state = useExpenseState();
+  const expenseEvents = useExpenseEvents();
+  const addExpenseEvent = useAddExpenseEvent();
+  const calculateRemainingBalance = useCalculateRemainingBalance();
   const { remainingBalance, fixedValue, variableValue } =
     calculateRemainingBalance();
   const [isModalVisible, setModalVisible] = useState(false);

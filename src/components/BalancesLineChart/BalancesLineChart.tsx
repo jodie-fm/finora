@@ -6,7 +6,10 @@ import {
 } from "react-native-gifted-charts";
 import { Key, useEffect, useMemo, useState } from "react";
 import listLastExpenseByDay from "../../helpers/listLastExpenseByDay";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useExpenseEvents,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 import { useChartStyle } from "../../hooks/useChartStyle";
 import Label from "../Label/Label";
 import Presets from "../Presets/Presets";
@@ -26,7 +29,8 @@ const Style_GapContainer = styled.View`
 
 const BalancesLineChart = () => {
   const isFocused = useIsFocused();
-  const { state, expenseEvents } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const expenseEvents = useExpenseEvents();
   const presetItems = [
     {
       label: "Derzeit",

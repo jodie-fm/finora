@@ -13,7 +13,10 @@ import styled, { css } from "styled-components/native";
 import { View } from "react-native";
 import parseValue from "../../helpers/parseValue";
 import uuid from "react-native-uuid";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 
 type EditExpenseModalProps = {
   expense: Expense;
@@ -47,7 +50,8 @@ const EditExpenseModal = ({
   visible,
   setVisible,
 }: EditExpenseModalProps) => {
-  const { state, addExpenseEvent } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
   const [editPaidValue, setEditPaidValue] = useState<string>();
   const [editExpense, setEditExpense] = useState<EditExpenseProps>();
 

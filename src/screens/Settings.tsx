@@ -18,7 +18,11 @@ import * as Sharing from "expo-sharing";
 import { Platform } from "react-native";
 import { Loan } from "../types/loans.type";
 import ConfirmModal from "../modals/ConfirmModal/ConfirmModal";
-import { useExpenseEventHandler } from "../hooks/useExpenseEventHandler";
+import {
+  useExpenseEvents,
+  useExpenseState,
+  useExpenseStorage,
+} from "../hooks/useExpenseEventHandler";
 import { Screens } from "../constants/Screens";
 
 const Style_Settings = styled.ScrollView.attrs(({ theme }) => {
@@ -34,8 +38,9 @@ const Style_Settings = styled.ScrollView.attrs(({ theme }) => {
 `;
 
 const Settings = () => {
-  const { MMKVCurrent, MMKVEvents, state, expenseEvents } =
-    useExpenseEventHandler();
+  const state = useExpenseState();
+  const expenseEvents = useExpenseEvents();
+  const { MMKVCurrent, MMKVEvents } = useExpenseStorage();
   const MMKV = useMMKV();
   const themeObj = useTheme();
   const [loans] = useMMKVObject<Loan[]>("loans");

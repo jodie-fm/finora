@@ -1,13 +1,11 @@
 import { BarChart } from "react-native-gifted-charts";
 import { useChartStyle } from "../../hooks/useChartStyle";
 import { View } from "react-native";
-import { useEffect, useMemo, useState } from "react";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
-import { ExpenseEvent } from "../../types/expenses.type";
+import { useMemo, useState } from "react";
+import { useExpenseEvents } from "../../hooks/useExpenseEventHandler";
 import Label from "../Label/Label";
 import currency from "../../helpers/numberCurrency";
 import styled, { css, useTheme } from "styled-components/native";
-import Checkbox from "../Checkbox/Checkbox";
 import RowView from "../RowView/RowView";
 import DotLight from "../DotLight/DotLight";
 import getBalancesEndOfMonth from "../../helpers/getBalancesEndOfMonth";
@@ -23,7 +21,7 @@ const BalancesBarChart = () => {
   const [parentWidth, setParentWidth] = useState<number>(0);
   const chartStyle = useChartStyle();
 
-  const { expenseEvents } = useExpenseEventHandler();
+  const expenseEvents = useExpenseEvents();
 
   const balancesEndOfMonth = useMemo(
     () => getBalancesEndOfMonth(expenseEvents),

@@ -8,7 +8,10 @@ import styled from "styled-components/native";
 import React, { useState } from "react";
 import InputValueModal from "../../modals/InputValueModal/InputValueModal";
 import uuid from "react-native-uuid";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 
 const Style_Item = styled(Pressable)`
   flex-direction: row;
@@ -16,7 +19,8 @@ const Style_Item = styled(Pressable)`
 `;
 
 const SavingsCard = () => {
-  const { state, addExpenseEvent } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
   const [isModalVisible, setModalVisible] = useState(false);
 
   const setValue = (value: number | undefined) => {

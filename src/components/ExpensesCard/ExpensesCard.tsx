@@ -11,12 +11,14 @@ import EditExpenseModal from "../../modals/EditExpenseModal/EditExpenseModal";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import ListItem from "./ListItem";
 import InfoExpenseModal from "../../modals/InfoExpenseModal/InfoExpenseModal";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 import RowView from "../RowView/RowView";
 import Pressable from "../Pressable/Pressable";
 import Modal from "../Modal/Modal";
 import currency from "../../helpers/numberCurrency";
-import { ExpenseEvent } from "../../types/expenses.type";
 
 type ExpensesCardProps = {
   type: Expense["type"];
@@ -24,7 +26,8 @@ type ExpensesCardProps = {
 
 const ExpensesCard = ({ type }: ExpensesCardProps) => {
   const theme = useTheme();
-  const { state, addExpenseEvent } = useExpenseEventHandler();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
   const [expenseId, setExpenseId] = useState<Expense["id"]>();
   const expense = useMemo(
     () => state?.expenses?.find((expense) => expense.id === expenseId),
@@ -81,7 +84,7 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
       if (!previousExpense) return;
       addExpenseEvent({
         action: "deleted",
-        expense: previousExpense as ExpenseEvent["expense"],
+        expense: previousExpense,
       });
     },
     [addExpenseEvent, state?.expenses],
@@ -107,7 +110,7 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
         setInfoModalVisible={setInfoModalVisible}
       />
     ),
-    [onDeletePress, setEditExpenseModalVisible, state?.expenses, type],
+    [onDeletePress, type],
   );
 
   const itemSeparator = useCallback(() => <Separator space="none" />, []);

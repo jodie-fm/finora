@@ -11,7 +11,7 @@ import currency from "../../helpers/numberCurrency";
 import Separator from "../../components/Separator/Separator";
 import { View } from "react-native";
 import Checkbox from "../../components/Checkbox/Checkbox";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import { useAddExpenseEvent } from "../../hooks/useExpenseEventHandler";
 import uuid from "react-native-uuid";
 
 type InfoExpenseModalProps = {
@@ -37,7 +37,7 @@ const InfoExpenseModal = ({
   setIsVisible,
   setIsEditModalVisible,
 }: InfoExpenseModalProps) => {
-  const { addExpenseEvent } = useExpenseEventHandler();
+  const addExpenseEvent = useAddExpenseEvent();
   const paid =
     expense?.paid &&
     Math.min(

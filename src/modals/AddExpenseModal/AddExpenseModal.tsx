@@ -7,35 +7,38 @@ import Input from "../../components/Input/Input";
 import RowView from "../../components/RowView/RowView";
 import Button from "../../components/Button/Button";
 import React, { useEffect, useState } from "react";
-import { Picker as RNPicker, PickerItemProps } from "@react-native-picker/picker";
+import {
+  Picker as RNPicker,
+  PickerItemProps,
+} from "@react-native-picker/picker";
 import { useTheme } from "styled-components/native";
 import uuid from "react-native-uuid";
 import parseValue from "../../helpers/parseValue";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
+import {
+  useAddExpenseEvent,
+  useExpenseState,
+} from "../../hooks/useExpenseEventHandler";
 
 type AddExpenseModalProps = {
   isVisible: boolean;
-  setIsVisible: React.Dispatch<React.SetStateAction<AddExpenseModalProps['isVisible']>>;
-}
+  setIsVisible: React.Dispatch<
+    React.SetStateAction<AddExpenseModalProps["isVisible"]>
+  >;
+};
 
-const AddExpenseModal = ({
-  isVisible,
-  setIsVisible
-}: AddExpenseModalProps) => {
+const AddExpenseModal = ({ isVisible, setIsVisible }: AddExpenseModalProps) => {
   const theme = useTheme();
-  const {
-    state,
-    addExpenseEvent,
-  } = useExpenseEventHandler();
-  const [ type, setType ] = useState<Expense['type']>('variable');
-  const [ description, setDescription ] = useState<string>();
-  const [ expense, setExpense ] = useState<string>();
+  const state = useExpenseState();
+  const addExpenseEvent = useAddExpenseEvent();
+  const [type, setType] = useState<Expense["type"]>("variable");
+  const [description, setDescription] = useState<string>();
+  const [expense, setExpense] = useState<string>();
   const props: Partial<PickerItemProps> = {
     color: theme.color.primary,
     style: {
       backgroundColor: theme.color.surface,
-    }
-  }
+    },
+  };
 
   const onRequestClose = () => {
     setIsVisible(false);
@@ -50,32 +53,32 @@ const AddExpenseModal = ({
       type,
       description,
       amount: parseValue(expense),
-      paid: type === 'fixed' ? [] : undefined,
-      date: new Date().toISOString()
+      paid: type === "fixed" ? [] : undefined,
+      date: new Date().toISOString(),
     };
     addExpenseEvent({
-      action: 'added',
+      action: "added",
       expense: expenseObject,
-    })
+    });
   };
 
   useEffect(() => {
     if (!state?.expenses) return;
     onRequestClose();
-  }, [ state?.expenses ]);
+  }, [state?.expenses]);
 
-  return (<View>
+  return (
+    <View>
       <ScrollView>
-        <Modal
-          visible={isVisible}
-          onRequestClose={onRequestClose}
-        >
-          <Label size="s" color="textSecondary">Eintrag verfassen</Label>
+        <Modal visible={isVisible} onRequestClose={onRequestClose}>
+          <Label size="s" color="textSecondary">
+            Eintrag verfassen
+          </Label>
           <Picker
             mode="dropdown"
             selectedValue={type}
             textColor="primary"
-            onValueChange={(item) => setType(item as Expense['type'])}
+            onValueChange={(item) => setType(item as Expense["type"])}
           >
             <RNPicker.Item label="Buchung" value="variable" {...props} />
             <RNPicker.Item label="Fixe Kosten" value="fixed" {...props} />
@@ -89,7 +92,12 @@ const AddExpenseModal = ({
             />
           </View>
           <View>
-            <Label size="s">Wert <Label size="s" color="danger">*</Label></Label>
+            <Label size="s">
+              Wert{" "}
+              <Label size="s" color="danger">
+                *
+              </Label>
+            </Label>
             <RowView>
               <Input
                 placeholder="12,34"
@@ -107,7 +115,8 @@ const AddExpenseModal = ({
           </Button>
         </Modal>
       </ScrollView>
-    </View>)
-}
+    </View>
+  );
+};
 
 export default AddExpenseModal;
