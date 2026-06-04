@@ -1,43 +1,70 @@
 import { ExpenseEvent } from "../types/expenses.type";
 
-const listLastExpenseByDay = (expenseEvents: ExpenseEvent[] | undefined, offsetMonths: number = 0) => {
-  let lastEvents: ExpenseEvent[] = [];
+const DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+const listLastExpenseByDay = (
+  expenseEvents: ExpenseEvent[] | undefined,
+  offsetMonths: number = 0,
+) => {
+  const lastEvents: ExpenseEvent[] = [];
   const today = new Date();
   const startDate = new Date(today);
   startDate.setMonth(today.getMonth() - offsetMonths);
   startDate.setDate(1);
 
-  if (!expenseEvents) {
+  if (!expenseEvents?.length) {
     return {
       lastEvents,
       startDate,
-      today
+      today,
     };
   }
-  const filteredEvents = expenseEvents.filter(event => new Date(event.date) >= startDate);
-  const previousEvents = expenseEvents.filter(event => new Date(event.date) < startDate);
-  filteredEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const totalDays = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const sortedEvents = expenseEvents
+    .map((event) => ({
+      event,
+      timestamp: new Date(event.date).getTime(),
+    }))
+    .filter(({ timestamp }) => !Number.isNaN(timestamp))
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  if (!sortedEvents.length) {
+    return {
+      lastEvents,
+      startDate,
+      today,
+    };
+  }
+
+  const totalDays = Math.ceil(
+    (today.getTime() - startDate.getTime()) / DAY_IN_MS,
+  );
+  let eventIndex = 0;
+  let latestEvent: ExpenseEvent | undefined;
 
   for (let i = 0; i <= totalDays; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
+    const currentTimestamp = currentDate.getTime();
 
-    const expenseEvent = filteredEvents.findLast(event => {
-      return new Date(event.date) <= currentDate
-    });
-    const previousExpenseEvent = previousEvents.findLast(event => {
-      return new Date(event.date) <= currentDate
-    });
-    lastEvents.push(expenseEvent || previousExpenseEvent || expenseEvents[0]);
+    while (
+      eventIndex < sortedEvents.length &&
+      sortedEvents[eventIndex].timestamp <= currentTimestamp
+    ) {
+      latestEvent = sortedEvents[eventIndex].event;
+      eventIndex += 1;
+    }
+
+    if (latestEvent) {
+      lastEvents.push(latestEvent);
+    }
   }
 
   return {
     lastEvents,
     startDate,
-    today
+    today,
   };
-}
+};
 
 export default listLastExpenseByDay;
