@@ -42,7 +42,10 @@
         }
       ],
       "expo-status-bar",
-      ["expo-build-properties", { "android": { "usePrecompiledHeaders": true } }]
+      [
+        "expo-build-properties",
+        { "android": { "usePrecompiledHeaders": true } }
+      ]
     ],
     "extra": {
       "eas": {
