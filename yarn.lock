@@ -3472,6 +3472,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-build-properties@npm:~56.0.16":
+  version: 56.0.16
+  resolution: "expo-build-properties@npm:56.0.16"
+  dependencies:
+    "@expo/schema-utils": "npm:^56.0.0"
+    resolve-from: "npm:^5.0.0"
+    semver: "npm:^7.6.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/da182de8ed64b554645be11f12064d20f62ae18be7ec460b0cd0da0b3a9a9be9cc386b13ed549fb38c277cc9a3e453f7e3aa0546e7d1c6e541be7af8e3c8469d
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~56.0.16":
   version: 56.0.16
   resolution: "expo-constants@npm:56.0.16"
@@ -3920,6 +3933,7 @@ __metadata:
     babel-plugin-transform-remove-console: "npm:6.9.4"
     expo: "npm:^56.0.0"
     expo-blur: "npm:~56.0.3"
+    expo-build-properties: "npm:~56.0.16"
     expo-constants: "npm:~56.0.16"
     expo-dev-client: "npm:~56.0.18"
     expo-document-picker: "npm:~56.0.4"
