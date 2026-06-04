@@ -17,7 +17,6 @@ import Swipeable, {
 } from "react-native-gesture-handler/ReanimatedSwipeable";
 import { Platform, View } from "react-native";
 import currency from "../../helpers/numberCurrency";
-import { useExpenseEventHandler } from "../../hooks/useExpenseEventHandler";
 import * as Haptics from "expo-haptics";
 import { useSetIsScrollEnabled } from "../../hooks/useAppStore";
 
@@ -29,6 +28,7 @@ type ItemProps = {
     progressPaid: React.ReactNode;
   };
   type: Expense["type"];
+  onDeletePress: (id: Expense["id"]) => void;
   setExpenseId: React.Dispatch<React.SetStateAction<Expense["id"] | undefined>>;
   setEditExpenseModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setInfoModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -70,6 +70,7 @@ const Style_EditAction = styled(Style_DeleteAction)`
 const Item = ({
   item: { id, description, amount, progressPaid },
   type,
+  onDeletePress,
   setExpenseId,
   setEditExpenseModalVisible,
   setInfoModalVisible,
@@ -77,7 +78,6 @@ const Item = ({
   const threshold = 200;
   const ref = useRef<SwipeableMethods>(null);
   const height = useSharedValue<number | undefined>(undefined);
-  const { state, addExpenseEvent } = useExpenseEventHandler();
   const setIsScrollEnabled = useSetIsScrollEnabled();
 
   const renderRightActions: SwipeableProps["renderRightActions"] = (
@@ -138,14 +138,8 @@ const Item = ({
     );
   };
 
-  const onDeletePress = () => {
-    const previousExpense = state?.expenses?.find(
-      (expense) => expense.id === id,
-    );
-    addExpenseEvent({
-      action: "deleted",
-      expense: previousExpense,
-    });
+  const onDelete = () => {
+    onDeletePress(id);
     setEditExpenseModalVisible(false);
     setIsScrollEnabled(true);
   };
@@ -168,7 +162,7 @@ const Item = ({
         duration: 250,
       },
       () => {
-        if (height.value === 0) runOnJS(onDeletePress)();
+        if (height.value === 0) runOnJS(onDelete)();
       },
     ),
   }));

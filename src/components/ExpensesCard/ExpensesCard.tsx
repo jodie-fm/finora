@@ -16,6 +16,7 @@ import RowView from "../RowView/RowView";
 import Pressable from "../Pressable/Pressable";
 import Modal from "../Modal/Modal";
 import currency from "../../helpers/numberCurrency";
+import { ExpenseEvent } from "../../types/expenses.type";
 
 type ExpensesCardProps = {
   type: Expense["type"];
@@ -23,7 +24,7 @@ type ExpensesCardProps = {
 
 const ExpensesCard = ({ type }: ExpensesCardProps) => {
   const theme = useTheme();
-  const { state } = useExpenseEventHandler();
+  const { state, addExpenseEvent } = useExpenseEventHandler();
   const [expenseId, setExpenseId] = useState<Expense["id"]>();
   const expense = useMemo(
     () => state?.expenses?.find((expense) => expense.id === expenseId),
@@ -72,6 +73,20 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
     [state?.expenses, type, theme.color.background],
   );
 
+  const onDeletePress = useCallback(
+    (id: Expense["id"]) => {
+      const previousExpense = state?.expenses?.find(
+        (expense) => expense.id === id,
+      );
+      if (!previousExpense) return;
+      addExpenseEvent({
+        action: "deleted",
+        expense: previousExpense as ExpenseEvent["expense"],
+      });
+    },
+    [addExpenseEvent, state?.expenses],
+  );
+
   const Title = () => (
     <Label color="primary" size="m" weight="bold">
       {type === "fixed" ? "Fixe Kosten" : "Buchungen"}
@@ -86,12 +101,13 @@ const ExpensesCard = ({ type }: ExpensesCardProps) => {
       <ListItem
         item={item}
         type={type}
+        onDeletePress={onDeletePress}
         setExpenseId={setExpenseId}
         setEditExpenseModalVisible={setEditExpenseModalVisible}
         setInfoModalVisible={setInfoModalVisible}
       />
     ),
-    [type],
+    [onDeletePress, setEditExpenseModalVisible, state?.expenses, type],
   );
 
   const itemSeparator = useCallback(() => <Separator space="none" />, []);
