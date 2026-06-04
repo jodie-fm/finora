@@ -7,6 +7,8 @@ import FontAwesomeIcon from "../components/FontAwesomeIcon/FontAwesomeIcon";
 import Label from "../components/Label/Label";
 import { Screens } from "../constants/Screens";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Platform } from "react-native";
+import * as Haptics from "expo-haptics";
 
 type Layout01Props = {
   /** The content to be displayed within the layout */
@@ -49,19 +51,27 @@ const Style_TopActions = styled.View`
 `;
 
 const Style_BottomBar = styled.View`
-  display: grid;
   flex-direction: row;
   justify-content: stretch;
   align-items: center;
   ${({ theme }) => css`
     background-color: ${theme.color.surface};
+    margin-inline: ${theme.size.s.px};
     margin-top: -${theme.size.l.px};
-    border-top-left-radius: ${theme.size.l.px};
-    border-top-right-radius: ${theme.size.l.px};
+    border-radius: ${theme.size.s.px};
   `}
 `;
 
-const Style_BottomBarNavItem = styled.Pressable`
+const Style_BottomBarNavItem = styled.Pressable.attrs(({ onPress }) => {
+  return {
+    onPress(e) {
+      onPress && Platform.OS === "android"
+        ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Confirm)
+        : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress?.(e);
+    },
+  };
+})`
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -71,6 +81,7 @@ const Style_BottomBarNavItem = styled.Pressable`
     gap: ${theme.size.s.px};
   `}
 `;
+
 const Style_CTAButton = styled.View`
   bottom: 75%;
   height: 1px;
@@ -157,7 +168,7 @@ const Layout01 = ({
         {children}
         <Style_BottomBar
           style={{
-            paddingBottom: insets.bottom,
+            marginBottom: insets.bottom,
             boxShadow: [
               {
                 color: theme.color.textSecondary,
