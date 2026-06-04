@@ -176,8 +176,6 @@ const Item = ({
       overshootLeft={false}
       rightThreshold={threshold}
       leftThreshold={threshold}
-      activateAfterLongPress={10000}
-      shouldCancelWhenOutside
       containerStyle={[{ overflow: "hidden" }, animatedStyle]}
       onSwipeableOpenStartDrag={() => setIsScrollEnabled(false)}
       onSwipeableWillClose={() => setIsScrollEnabled(true)}

@@ -27,6 +27,7 @@ const Style_AmountView = styled.View`
   ${({ theme }) => css`
     background-color: ${theme.color.background};
     padding: ${theme.size.s.px};
+    gap: ${theme.size.xl.px};
     border-radius: ${theme.size.s.value * 8}px;
   `}
 `;
@@ -107,9 +108,9 @@ const InfoExpenseModal = ({
         </RowView>
 
         {paid !== undefined && (
-          <>
-            <Separator />
-            <RowView justifyContent="space-between">
+          <RowView>
+            <RowView gap="xs" alignItems="flex-start">
+              <FontAwesomeIcon icon="check" color="success" size="s" />
               <View>
                 <Label color="success" size="s" align="left">
                   Bezahlt
@@ -118,16 +119,17 @@ const InfoExpenseModal = ({
                   {currency(paid)}
                 </Label>
               </View>
-              <View>
-                <Label color="danger" size="s" align="right">
-                  Restbetrag
-                </Label>
-                <Label color="textPrimary" size="s" weight="bold" align="right">
-                  {currency(rest)}
-                </Label>
-              </View>
             </RowView>
-          </>
+            <Separator space="none" isFullWidth />
+            <View>
+              <Label color="danger" size="s" align="right">
+                Restbetrag
+              </Label>
+              <Label color="textPrimary" size="s" weight="bold" align="right">
+                {currency(rest)}
+              </Label>
+            </View>
+          </RowView>
         )}
       </Style_AmountView>
       {expense.type === "fixed" && (

@@ -12,8 +12,6 @@ import Separator from "../components/Separator/Separator";
 import RowView from "../components/RowView/RowView";
 import FontAwesomeIcon from "../components/FontAwesomeIcon/FontAwesomeIcon";
 import React, { useMemo, useState } from "react";
-import * as FileSystem from "expo-file-system";
-import * as DocumentPicker from "expo-document-picker";
 import * as Sharing from "expo-sharing";
 import { Platform, View } from "react-native";
 import { Loan } from "../types/loans.type";
@@ -25,6 +23,7 @@ import {
 } from "../hooks/useExpenseEventHandler";
 import { Screens } from "../constants/Screens";
 import compactExpenseEvents from "../helpers/compactExpenseEvents";
+import { Directory, Paths, File } from "expo-file-system";
 
 const Style_Settings = styled.ScrollView.attrs(({ theme }) => {
   return {
@@ -93,15 +92,11 @@ const Settings = () => {
   };
 
   const importData = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: "application/json",
-    });
+    const file = await File.pickFileAsync(undefined, "application/json");
 
-    if (result.canceled) return;
+    if (!file || Array.isArray(file)) return;
 
-    const fileContent = await FileSystem.readAsStringAsync(
-      result.assets[0].uri,
-    );
+    const fileContent = await file.text();
     const data: {
       state: typeof state;
       expenseEvents: typeof expenseEvents;
@@ -126,32 +121,23 @@ const Settings = () => {
       loans,
     });
     const filename = `Finora_${new Date().toISOString().split("T")[0]}.json`;
-    const path = FileSystem.cacheDirectory + filename;
-    await FileSystem.writeAsStringAsync(path, json);
 
     if (Platform.OS === "android") {
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      const directory = await Directory.pickDirectoryAsync();
+      if (!directory.exists) return;
 
-      if (!permissions.granted) {
-        await FileSystem.deleteAsync(path);
-        return;
-      }
-
-      const uri = await FileSystem.StorageAccessFramework.createFileAsync(
-        permissions.directoryUri,
-        filename,
-        "application/json",
-      );
-      await FileSystem.StorageAccessFramework.writeAsStringAsync(uri, json);
+      const exportFile = directory.createFile(filename, "application/json");
+      exportFile.write(json);
     } else {
+      const cacheFile = new File(Paths.cache, filename);
+      cacheFile.write(json);
       if (!(await Sharing.isAvailableAsync())) {
-        await FileSystem.deleteAsync(path);
+        cacheFile.delete();
         return;
       }
-      await Sharing.shareAsync(path);
+      await Sharing.shareAsync(cacheFile.uri);
+      cacheFile.delete();
     }
-    await FileSystem.deleteAsync(path);
   };
 
   const historyStats = useMemo(() => {
