@@ -26,7 +26,7 @@ const Style_FontAwesomeIcon = styled(
   ${({ $translateY }) =>
     $translateY &&
     css`
-      transform: translateY(3px);
+      transform: translateY(${$translateY}px);
     `}
 `;
 

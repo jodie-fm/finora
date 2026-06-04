@@ -20,11 +20,12 @@ import { View } from "react-native";
 
 const Style_ProgressBar = styled(CircularProgressBase).attrs(({ theme }) => {
   return {
-    circleBackgroundColor: theme.color.background,
+    // circleBackgroundColor: theme.color.background,
     inActiveStrokeColor: theme.color.background,
     activeStrokeColor: theme.color.primary,
     inActiveStrokeWidth: 24,
-    radius: 60,
+    activeStrokeWidth: 15,
+    radius: 30,
     duration: 1000,
   };
 })``;
@@ -93,14 +94,7 @@ const LoanFunds = () => {
           </RowView>
           <RowView flexWrap="nowrap">
             <Style_ProgressBarContainer>
-              <Style_ProgressBar value={totalReturned} maxValue={totalLend}>
-                <Label align="center" weight="bold">
-                  {currency(totalReturned)}
-                </Label>
-                <Label align="center" color="textSecondary" size="s">
-                  /{currency(totalLend)}
-                </Label>
-              </Style_ProgressBar>
+              <Style_ProgressBar value={totalReturned} maxValue={totalLend} />
             </Style_ProgressBarContainer>
             <View style={{ flex: 1 }}>
               <RowView justifyContent="space-between">
@@ -115,7 +109,11 @@ const LoanFunds = () => {
                 <Label color="textSecondary" size="s">
                   Bezahlt
                 </Label>
-                <Label color="primary" size="s" weight="bold">
+                <Label
+                  color={totalReturned > 0 ? "primary" : "textSecondary"}
+                  size="s"
+                  weight="bold"
+                >
                   {currency(totalReturned)}
                 </Label>
               </RowView>

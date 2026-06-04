@@ -110,9 +110,18 @@ const InfoExpenseModal = ({
         {paid !== undefined && (
           <RowView>
             <RowView gap="xs" alignItems="flex-start">
-              <FontAwesomeIcon icon="check" color="success" size="s" />
+              <FontAwesomeIcon
+                icon="check"
+                color={paid > 0 ? "success" : "textSecondary"}
+                size="s"
+                translateY={3}
+              />
               <View>
-                <Label color="success" size="s" align="left">
+                <Label
+                  color={paid > 0 ? "success" : "textSecondary"}
+                  size="s"
+                  align="left"
+                >
                   Bezahlt
                 </Label>
                 <Label color="textPrimary" size="s" weight="bold" align="left">
@@ -121,14 +130,26 @@ const InfoExpenseModal = ({
               </View>
             </RowView>
             <Separator space="none" isFullWidth />
-            <View>
-              <Label color="danger" size="s" align="right">
-                Restbetrag
-              </Label>
-              <Label color="textPrimary" size="s" weight="bold" align="right">
-                {currency(rest)}
-              </Label>
-            </View>
+            <RowView gap="xs" alignItems="flex-start">
+              <View>
+                <Label
+                  color={rest !== 0 ? "danger" : "textSecondary"}
+                  size="s"
+                  align="right"
+                >
+                  Restbetrag
+                </Label>
+                <Label color="textPrimary" size="s" weight="bold" align="right">
+                  {currency(rest)}
+                </Label>
+              </View>
+              <FontAwesomeIcon
+                icon="money-bill-transfer"
+                color={rest !== 0 ? "danger" : "textSecondary"}
+                size="s"
+                translateY={3}
+              />
+            </RowView>
           </RowView>
         )}
       </Style_AmountView>
@@ -140,7 +161,7 @@ const InfoExpenseModal = ({
           <Checkbox isActive={rest === 0} setIsActive={onIsPaidPress} />
         </RowView>
       )}
-      <Button onPress={onFinishPress}>
+      <Button onPress={onFinishPress} padding="s">
         <Label>OK</Label>
       </Button>
     </Modal>
