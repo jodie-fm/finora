@@ -11,11 +11,11 @@ import Picker from "../components/Picker/Picker";
 import Separator from "../components/Separator/Separator";
 import RowView from "../components/RowView/RowView";
 import FontAwesomeIcon from "../components/FontAwesomeIcon/FontAwesomeIcon";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 import * as Sharing from "expo-sharing";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { Loan } from "../types/loans.type";
 import ConfirmModal from "../modals/ConfirmModal/ConfirmModal";
 import {
@@ -24,6 +24,7 @@ import {
   useExpenseStorage,
 } from "../hooks/useExpenseEventHandler";
 import { Screens } from "../constants/Screens";
+import compactExpenseEvents from "../helpers/compactExpenseEvents";
 
 const Style_Settings = styled.ScrollView.attrs(({ theme }) => {
   return {
@@ -46,6 +47,8 @@ const Settings = () => {
   const [loans] = useMMKVObject<Loan[]>("loans");
   const [isConfirmModalVisible, setConfirmModalVisible] = useState(false);
   const [isConfirmHistoryModalVisible, setConfirmHistoryModalVisible] =
+    useState(false);
+  const [isConfirmCompactHistoryVisible, setConfirmCompactHistoryVisible] =
     useState(false);
   const [theme, setTheme] = useMMKVString("theme");
   const props: Partial<PickerItemProps> = {
@@ -74,6 +77,19 @@ const Settings = () => {
 
   const onCancelHistoryDeletePress = () => {
     setConfirmHistoryModalVisible(false);
+  };
+
+  const onConfirmCompactHistoryPress = () => {
+    const compactedEvents = compactExpenseEvents(expenseEvents, {
+      retainRecentMonths: 6,
+    });
+
+    MMKVEvents.set("expenseEvents", JSON.stringify(compactedEvents));
+    setConfirmCompactHistoryVisible(false);
+  };
+
+  const onCancelCompactHistoryPress = () => {
+    setConfirmCompactHistoryVisible(false);
   };
 
   const importData = async () => {
@@ -138,6 +154,17 @@ const Settings = () => {
     await FileSystem.deleteAsync(path);
   };
 
+  const historyStats = useMemo(() => {
+    const eventsCount = expenseEvents?.length || 0;
+    const payloadCharacters = JSON.stringify(expenseEvents || []).length;
+    const payloadKilobytes = payloadCharacters / 1024;
+
+    return {
+      eventsCount,
+      payloadKilobytes,
+    };
+  }, [expenseEvents]);
+
   return (
     <Layout01 title={Screens.SETTINGS}>
       <Style_Settings>
@@ -168,6 +195,26 @@ const Settings = () => {
             Verlauf löschen
           </Label>
         </Button>
+        <Button onPress={() => setConfirmCompactHistoryVisible(true)}>
+          <FontAwesomeIcon icon="compress" color="primary" />
+          <Label align="center">Verlauf komprimieren</Label>
+        </Button>
+        <RowView justifyContent="space-between">
+          <Label size="s" color="textSecondary">
+            Verlauf Einträge
+          </Label>
+          <Label size="s" weight="bold">
+            {historyStats.eventsCount}
+          </Label>
+        </RowView>
+        <RowView justifyContent="space-between">
+          <Label size="s" color="textSecondary">
+            Verlauf Größe (ca.)
+          </Label>
+          <Label size="s" weight="bold">
+            {historyStats.payloadKilobytes.toFixed(1)} KB
+          </Label>
+        </RowView>
         <ConfirmModal
           heading="Wirklich den Verlauf löschen?"
           subtext="Durch den Verlauf werden zeitliche Analysen, Auswertungen & Trends dargestellt."
@@ -188,6 +235,23 @@ const Settings = () => {
           ]}
           isVisible={isConfirmHistoryModalVisible}
           setIsVisible={setConfirmHistoryModalVisible}
+        />
+        <ConfirmModal
+          heading="Verlauf komprimieren?"
+          subtext="Ältere Verlaufseinträge werden pro Tag auf den letzten Stand reduziert. Die letzten 6 Monate bleiben unverändert."
+          buttons={[
+            {
+              type: "primary",
+              onPress: onConfirmCompactHistoryPress,
+              children: <Label align="center">Komprimieren</Label>,
+            },
+            {
+              onPress: onCancelCompactHistoryPress,
+              children: <Label align="center">Abbrechen</Label>,
+            },
+          ]}
+          isVisible={isConfirmCompactHistoryVisible}
+          setIsVisible={setConfirmCompactHistoryVisible}
         />
         <Separator />
         <Label weight="bold" size="l">
@@ -229,6 +293,7 @@ const Settings = () => {
           isVisible={isConfirmModalVisible}
           setIsVisible={setConfirmModalVisible}
         />
+        <View />
       </Style_Settings>
     </Layout01>
   );
