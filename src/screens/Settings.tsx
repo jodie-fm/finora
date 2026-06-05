@@ -120,7 +120,7 @@ const Settings = () => {
       expenseEvents,
       loans,
     });
-    const filename = `Finora_${new Date().toISOString().split("T")[0]}.json`;
+    const filename = `Glance_${new Date().toISOString().split("T")[0]}.json`;
 
     if (Platform.OS === "android") {
       const directory = await Directory.pickDirectoryAsync();
