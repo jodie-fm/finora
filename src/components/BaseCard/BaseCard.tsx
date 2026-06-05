@@ -1,12 +1,12 @@
-import React from 'react';
-import styled, { css } from 'styled-components/native';
+import React from "react";
+import styled, { css } from "styled-components/native";
 
 type BaseCardProps = {
   children?: React.ReactNode;
   padding?: string;
-}
+};
 
-const Style_BaseCard = styled.View<{$padding?: BaseCardProps['padding']}>`
+const Style_BaseCard = styled.View<{ $padding?: BaseCardProps["padding"] }>`
   display: flex;
   position: relative;
   ${({ theme, $padding }) => css`
@@ -17,11 +17,7 @@ const Style_BaseCard = styled.View<{$padding?: BaseCardProps['padding']}>`
 `;
 
 const BaseCard = ({ children, padding }: BaseCardProps) => {
-  return (
-    <Style_BaseCard $padding={padding}>
-      {children}
-    </Style_BaseCard>
-  );
+  return <Style_BaseCard $padding={padding}>{children}</Style_BaseCard>;
 };
 
 export default BaseCard;
