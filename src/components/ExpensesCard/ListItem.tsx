@@ -4,7 +4,6 @@ import React, { memo, useRef } from "react";
 import Label from "../Label/Label";
 import FontAwesomeIcon from "../FontAwesomeIcon/FontAwesomeIcon";
 import Animated, {
-  runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
@@ -19,6 +18,7 @@ import { Platform, View } from "react-native";
 import currency from "../../helpers/numberCurrency";
 import * as Haptics from "expo-haptics";
 import { useSetIsScrollEnabled } from "../../hooks/useAppStore";
+import { scheduleOnRN } from "react-native-worklets";
 
 type ItemProps = {
   item: {
@@ -94,10 +94,14 @@ const Item = ({
           Math.abs(prepared) >= threshold
         ) {
           Platform.OS === "android"
-            ? runOnJS(Haptics.performAndroidHapticsAsync)(
+            ? scheduleOnRN(
+                Haptics.performAndroidHapticsAsync,
                 Haptics.AndroidHaptics.Confirm,
               )
-            : runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+            : scheduleOnRN(
+                Haptics.impactAsync,
+                Haptics.ImpactFeedbackStyle.Light,
+              );
         }
       },
       [],
@@ -123,10 +127,14 @@ const Item = ({
           Math.abs(prepared) >= threshold
         ) {
           Platform.OS === "android"
-            ? runOnJS(Haptics.performAndroidHapticsAsync)(
+            ? scheduleOnRN(
+                Haptics.performAndroidHapticsAsync,
                 Haptics.AndroidHaptics.Confirm,
               )
-            : runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
+            : scheduleOnRN(
+                Haptics.impactAsync,
+                Haptics.ImpactFeedbackStyle.Light,
+              );
         }
       },
       [],
@@ -162,7 +170,7 @@ const Item = ({
         duration: 250,
       },
       () => {
-        if (height.value === 0) runOnJS(onDelete)();
+        if (height.value === 0) scheduleOnRN(onDelete);
       },
     ),
   }));
