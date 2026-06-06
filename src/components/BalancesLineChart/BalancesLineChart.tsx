@@ -110,7 +110,8 @@ const BalancesLineChart = () => {
     [],
   );
 
-  const currentPointDate = currentPointDatas?.remainingBalanceLineData.pointDate;
+  const currentPointDate =
+    currentPointDatas?.remainingBalanceLineData.pointDate;
 
   const remainingBalanceLineData = useMemo<ChartLineDataItem[]>(
     () =>
@@ -177,8 +178,7 @@ const BalancesLineChart = () => {
   return (
     <Style_GapContainer>
       <Label size="s" color="textSecondary" align="center">
-        {axisDateFormatter.format(startDate)}{" "}
-        -{" "}
+        {axisDateFormatter.format(startDate)} -{" "}
         {mediumDateFormatter.format(today)}
       </Label>
       <Presets
@@ -196,7 +196,9 @@ const BalancesLineChart = () => {
               </Label>
               <Label size="s" weight="bold">
                 {axisDateFormatter.format(
-                  new Date(currentPointDatas.remainingBalanceLineData.pointDate),
+                  new Date(
+                    currentPointDatas.remainingBalanceLineData.pointDate,
+                  ),
                 )}
               </Label>
             </RowView>
@@ -238,13 +240,15 @@ const BalancesLineChart = () => {
           maxValue={chartBounds.maxValue}
           mostNegativeValue={chartBounds.mostNegativeValue}
           height={200}
+          curved
           curveType={CurveType.QUADRATIC}
           areaChart
           hideDataPoints
           scrollToEnd
           labelsExtraHeight={25}
           getPointerProps={({ pointerIndex }: { pointerIndex: number }) => {
-            const remainingBalancePoint = remainingBalanceLineData[pointerIndex];
+            const remainingBalancePoint =
+              remainingBalanceLineData[pointerIndex];
             const balancePoint = balanceLineData[pointerIndex];
 
             if (!remainingBalancePoint || !balancePoint) return;

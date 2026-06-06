@@ -18,6 +18,7 @@ type Style_ButtonProps = {
   $padding: NonNullable<ButtonProps["padding"]>;
   $size: NonNullable<ButtonProps["padding"]>;
   $isPressed: boolean;
+  $isDisabled?: boolean | null;
 };
 
 type Style_ButtonContainerProps = {
@@ -67,11 +68,12 @@ const Style_Button = styled.View<Style_ButtonProps>`
   border-radius: 999px;
   align-items: center;
   justify-content: center;
-  ${({ theme, $type, $padding, $size, $isPressed }) => css`
+  ${({ theme, $type, $padding, $size, $isPressed, $isDisabled }) => css`
     ${handleButtonType($type, theme, $isPressed)};
     font-size: ${theme.size[$size].px};
     padding: ${theme.size[$padding].px};
     gap: ${theme.size.s.value * 8}px;
+    opacity: ${$isDisabled ? 0.5 : 1};
   `}
 `;
 
@@ -93,6 +95,7 @@ const Button = ({
             $padding={padding}
             $size={size}
             $isPressed={pressed}
+            $isDisabled={rest.disabled}
           >
             {children}
           </Style_Button>

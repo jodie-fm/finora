@@ -54,7 +54,7 @@ const Style_Check = styled.View`
   `}
 `;
 
-const LoanFunds = () => {
+const Financing = () => {
   const isFocused = useIsFocused();
   const [loans] = useMMKVObject<Loan[]>("loans");
   const [loanId, setLoanId] = useState<Loan["id"]>();
@@ -134,7 +134,7 @@ const LoanFunds = () => {
   return (
     isFocused && (
       <Layout01
-        title={Screens.LOANFUNDS}
+        title={Screens.FINANCING}
         onCTAClick={() => setIsAddModalVisible(true)}
       >
         <SafeScrollView>
@@ -165,4 +165,4 @@ const LoanFunds = () => {
   );
 };
 
-export default LoanFunds;
+export default Financing;

@@ -19,6 +19,10 @@ type Layout01Props = {
   topAction?: React.ReactNode;
   /** An optional callback function to be executed when the CTA button is clicked */
   onCTAClick?: () => void;
+  /** A boolean to determine whether the top bar should be hidden */
+  isTopBarHidden?: boolean;
+  /** A boolean to determine whether the bottom navigation bar should be hidden */
+  isBottomBarHidden?: boolean;
 };
 
 const Style_SafeView = styled.View`
@@ -92,6 +96,8 @@ const Layout01 = ({
   title,
   topAction,
   onCTAClick,
+  isTopBarHidden = false,
+  isBottomBarHidden = false,
 }: Layout01Props) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -101,8 +107,8 @@ const Layout01 = ({
     navigation.navigate("Home", undefined, { pop: true });
   };
 
-  const onLoanFundsPress = () => {
-    navigation.navigate("LoanFunds", undefined, {
+  const onFinancingPress = () => {
+    navigation.navigate("Financing", undefined, {
       pop: title !== Screens.HOME,
     });
   };
@@ -125,9 +131,9 @@ const Layout01 = ({
       <Style_BottomBarNavItem onPress={onHomePress}>
         <FontAwesomeIcon color={getColor(Screens.HOME)} icon="home" />
       </Style_BottomBarNavItem>
-      <Style_BottomBarNavItem onPress={onLoanFundsPress}>
+      <Style_BottomBarNavItem onPress={onFinancingPress}>
         <FontAwesomeIcon
-          color={getColor(Screens.LOANFUNDS)}
+          color={getColor(Screens.FINANCING)}
           icon="hand-holding-dollar"
         />
       </Style_BottomBarNavItem>
@@ -157,39 +163,43 @@ const Layout01 = ({
       }}
     >
       <Style_Layout01>
-        <Style_TopActions>
-          {title && (
-            <Label size="l" weight="bold">
-              {title}
-            </Label>
-          )}
-          {topAction}
-        </Style_TopActions>
+        {!isTopBarHidden && (
+          <Style_TopActions>
+            {title && (
+              <Label size="l" weight="bold">
+                {title}
+              </Label>
+            )}
+            {topAction}
+          </Style_TopActions>
+        )}
         {children}
-        <Style_BottomBar
-          style={{
-            marginBottom: insets.bottom,
-            boxShadow: [
-              {
-                color: theme.color.shadow,
-                offsetX: 0,
-                offsetY: 10,
-                blurRadius: 20,
-                spreadDistance: -5,
-              },
-            ],
-          }}
-        >
-          {Style_BottomBarLeft}
-          {onCTAClick && (
-            <Style_CTAButton>
-              <Button type="primary" padding="l" onPress={onCTAClick}>
-                <FontAwesomeIcon color="surface" size="l" icon="plus" />
-              </Button>
-            </Style_CTAButton>
-          )}
-          {Style_BottomBarRight}
-        </Style_BottomBar>
+        {!isBottomBarHidden && (
+          <Style_BottomBar
+            style={{
+              marginBottom: insets.bottom,
+              boxShadow: [
+                {
+                  color: theme.color.shadow,
+                  offsetX: 0,
+                  offsetY: 10,
+                  blurRadius: 20,
+                  spreadDistance: -5,
+                },
+              ],
+            }}
+          >
+            {Style_BottomBarLeft}
+            {onCTAClick && (
+              <Style_CTAButton>
+                <Button type="primary" padding="l" onPress={onCTAClick}>
+                  <FontAwesomeIcon color="surface" size="l" icon="plus" />
+                </Button>
+              </Style_CTAButton>
+            )}
+            {Style_BottomBarRight}
+          </Style_BottomBar>
+        )}
       </Style_Layout01>
     </Style_SafeView>
   );

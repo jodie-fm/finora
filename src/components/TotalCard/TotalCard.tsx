@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import BaseCard from "../BaseCard/BaseCard";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import Label from "../Label/Label";
 import styled, { css } from "styled-components/native";
 import currency from "../../helpers/numberCurrency";
@@ -17,34 +17,13 @@ import {
   useExpenseState,
 } from "../../hooks/useExpenseEventHandler";
 import getBalancesEndOfMonth from "../../helpers/getBalancesEndOfMonth";
-import { Host } from "@expo/ui";
-import { LinearProgressIndicator } from "@expo/ui/jetpack-compose";
-import { ProgressView } from "@expo/ui/swift-ui";
-import { tint } from "@expo/ui/swift-ui/modifiers";
+import ProgressIndicator from "../ProgressIndicator/ProgressIndicator";
 
 const Style_Item = styled(Pressable)`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 `;
-
-const Style_ProgressJetpack = styled(LinearProgressIndicator).attrs(
-  ({ theme }) => {
-    return {
-      color: theme.color.primary,
-      trackColor: theme.color.lightTransparency,
-      drawStopIndicator: {
-        stopSize: 0,
-      },
-    };
-  },
-)``;
-
-const Style_ProgressSwift = styled(ProgressView).attrs(({ theme }) => {
-  return {
-    modifiers: [tint(theme.color.primary)],
-  };
-})``;
 
 const Style_ProgressSeparator = styled.View<{ $hasBottomMargin: boolean }>`
   ${({ theme, $hasBottomMargin }) => css`
@@ -155,27 +134,13 @@ const TotalCard = () => {
           fixedValue || variableValue || state?.savings?.amount,
         )}
       >
-        {Platform.OS === "android" ? (
-          <Host matchContents={{ vertical: true }}>
-            <Style_ProgressJetpack
-              progress={
-                remainingBalance && state?.currentBalance
-                  ? remainingBalance / state?.currentBalance?.amount
-                  : 0
-              }
-            />
-          </Host>
-        ) : (
-          <Host style={{ flex: 1 }}>
-            <Style_ProgressSwift
-              value={
-                remainingBalance && state?.currentBalance
-                  ? remainingBalance / state?.currentBalance?.amount
-                  : 0
-              }
-            />
-          </Host>
-        )}
+        <ProgressIndicator
+          progress={
+            remainingBalance && state?.currentBalance
+              ? remainingBalance / state?.currentBalance?.amount
+              : 0
+          }
+        />
       </Style_ProgressSeparator>
       {fixedValue && (
         <RowView style={{ justifyContent: "space-between" }}>

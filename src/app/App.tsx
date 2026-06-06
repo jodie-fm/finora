@@ -17,10 +17,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Inter_400Regular } from "@expo-google-fonts/inter/400Regular";
 import { Inter_700Bold } from "@expo-google-fonts/inter/700Bold";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
-import { Appearance, Platform, useColorScheme, View } from "react-native";
+import { Appearance, useColorScheme, View } from "react-native";
 import Settings from "../screens/Settings";
 import { useMMKVString } from "react-native-mmkv";
-import LoanFunds from "../screens/LoanFunds";
+import Financing from "../screens/Financing";
 import Analytics from "../screens/Analytics";
 import { Screens } from "../constants/Screens";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -47,10 +47,10 @@ const RootStack = createNativeStackNavigator({
         title: Screens.HOME,
       },
     },
-    LoanFunds: {
-      screen: LoanFunds,
+    Financing: {
+      screen: Financing,
       options: {
-        title: Screens.LOANFUNDS,
+        title: Screens.FINANCING,
       },
     },
     Analytics: {
