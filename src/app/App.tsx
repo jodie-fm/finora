@@ -12,18 +12,18 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 
 import Home from "../screens/Home";
-import { createStaticNavigation } from "@react-navigation/native";
+import { NavigationContainer, Theme } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Inter_400Regular } from "@expo-google-fonts/inter/400Regular";
 import { Inter_700Bold } from "@expo-google-fonts/inter/700Bold";
 import { useFonts } from "@expo-google-fonts/inter/useFonts";
 import { Appearance, useColorScheme, View } from "react-native";
 import Settings from "../screens/Settings";
-import { useMMKVString } from "react-native-mmkv";
+import { useMMKVBoolean, useMMKVString } from "react-native-mmkv";
 import Financing from "../screens/Financing";
 import Analytics from "../screens/Analytics";
-import { Screens } from "../constants/Screens";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Onboarding from "../screens/Onboarding/Onboarding";
 
 SplashScreen.setOptions({
   duration: 1000,
@@ -34,45 +34,35 @@ SplashScreen.preventAutoHideAsync();
 
 library.add(fab, fas, far);
 
-const RootStack = createNativeStackNavigator({
-  initialRouteName: "Home",
-  backBehavior: "history",
-  screenOptions: {
-    headerShown: false,
-  },
-  screens: {
-    Home: {
-      screen: Home,
-      options: {
-        title: Screens.HOME,
-      },
-    },
-    Financing: {
-      screen: Financing,
-      options: {
-        title: Screens.FINANCING,
-      },
-    },
-    Analytics: {
-      screen: Analytics,
-      options: {
-        title: Screens.ANALYTICS,
-        lazy: false,
-      },
-    },
-    Settings: {
-      screen: Settings,
-      options: {
-        title: Screens.SETTINGS,
-      },
-    },
-  },
-});
+const RootStack = createNativeStackNavigator();
 
-const Navigation = createStaticNavigation(RootStack);
+const Navigation = ({ theme }: { theme: Theme }) => {
+  const [hasSeenOnboarding] = useMMKVBoolean("hasSeenOnboarding");
+  return (
+    <NavigationContainer theme={theme}>
+      <RootStack.Navigator
+        initialRouteName={hasSeenOnboarding ? "Home" : "Onboarding"}
+        screenOptions={{ headerShown: false }}
+      >
+        {hasSeenOnboarding ? (
+          <>
+            <RootStack.Screen name="Home" component={Home} />
+            <RootStack.Screen name="Financing" component={Financing} />
+            <RootStack.Screen name="Analytics" component={Analytics} />
+            <RootStack.Screen name="Settings" component={Settings} />
+          </>
+        ) : (
+          <RootStack.Screen name="Onboarding" component={Onboarding} />
+        )}
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 const App = () => {
-  const [selectedTheme] = useMMKVString("theme") || [useColorScheme()];
+  const [theme] = useMMKVString("theme");
+  const deviceScheme = useColorScheme();
+  const selectedTheme = theme || deviceScheme;
   const scheme = selectedTheme === "dark" ? "dark" : "light";
   const invScheme = selectedTheme === "dark" ? "light" : "dark";
   const themeObject = selectedTheme === "dark" ? darkTheme : lightTheme;
@@ -105,6 +95,7 @@ const App = () => {
       },
     },
   };
+
   const [loaded] = useFonts({
     Inter_400Regular,
     Inter_700Bold,
@@ -112,7 +103,7 @@ const App = () => {
 
   useEffect(() => {
     Appearance.setColorScheme(scheme);
-  }, [scheme, invScheme]);
+  }, [scheme]);
 
   useEffect(() => {
     if (!loaded) return;

@@ -3,4 +3,5 @@ export const Screens = {
   FINANCING: "Finanzierung",
   ANALYTICS: "Analyse",
   SETTINGS: "Einstellungen",
+  ONBOARDING: "Onboarding",
 } as const;

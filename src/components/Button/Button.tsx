@@ -3,6 +3,10 @@ import styled, { css, DefaultTheme } from "styled-components/native";
 import { PressableProps } from "react-native";
 import theme from "../../assets/style/theme";
 import Pressable from "../Pressable/Pressable";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 type ButtonProps = PressableProps & {
   children?: ReactNode;
@@ -18,7 +22,6 @@ type Style_ButtonProps = {
   $padding: NonNullable<ButtonProps["padding"]>;
   $size: NonNullable<ButtonProps["padding"]>;
   $isPressed: boolean;
-  $isDisabled?: boolean | null;
 };
 
 type Style_ButtonContainerProps = {
@@ -63,17 +66,16 @@ const Style_ButtonContainer = styled.View<Style_ButtonContainerProps>`
     `}
 `;
 
-const Style_Button = styled.View<Style_ButtonProps>`
+const Style_Button = styled(Animated.View)<Style_ButtonProps>`
   flex-direction: row;
   border-radius: 999px;
   align-items: center;
   justify-content: center;
-  ${({ theme, $type, $padding, $size, $isPressed, $isDisabled }) => css`
+  ${({ theme, $type, $padding, $size, $isPressed }) => css`
     ${handleButtonType($type, theme, $isPressed)};
     font-size: ${theme.size[$size].px};
     padding: ${theme.size[$padding].px};
     gap: ${theme.size.s.value * 8}px;
-    opacity: ${$isDisabled ? 0.5 : 1};
   `}
 `;
 
@@ -86,16 +88,20 @@ const Button = ({
   onPress,
   ...rest
 }: ButtonProps) => {
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(rest.disabled ? 0.5 : 1, { duration: 300 }),
+  }));
+
   return (
     <Style_ButtonContainer $isFullWidth={isFullWidth}>
       <Pressable hitSlop={0} onPress={onPress} {...rest}>
         {({ pressed }) => (
           <Style_Button
+            style={animatedStyle}
             $type={type}
             $padding={padding}
             $size={size}
             $isPressed={pressed}
-            $isDisabled={rest.disabled}
           >
             {children}
           </Style_Button>

@@ -161,11 +161,16 @@ const Settings = () => {
           <Picker
             mode="dropdown"
             style={{ flex: 1 }}
-            selectedValue={theme}
-            onValueChange={(value) => setTheme(value as string)}
+            selectedValue={theme || "system"}
+            onValueChange={(value) =>
+              value === "system"
+                ? setTheme(undefined)
+                : setTheme(value as string)
+            }
           >
             <RNPicker.Item value="light" label="Hell" {...props} />
             <RNPicker.Item value="dark" label="Dunkel" {...props} />
+            <RNPicker.Item value="system" label="System" {...props} />
           </Picker>
         </RowView>
         <Separator />
